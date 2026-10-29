@@ -61,8 +61,8 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <div id="bar"><span id="sum">尚未選餐</span><button onclick="openSheet()">去結帳</button></div>
 <div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div class="in">
 <h2>確認訂單</h2><pre id="items"></pre>
-<label>姓名</label><input id="nm" autocomplete="name">
-<label>電話</label><input id="ph" type="tel" autocomplete="tel">
+<label>姓名</label><input id="nm" name="name" autocomplete="name">
+<label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
 <label>取餐時間</label><select id="tm" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select><p class="note" id="tmHint">上午 10:30–13:30、下午 4:30–7:30 可取餐；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
@@ -99,6 +99,7 @@ for(let i=0;i<7&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),no
 for(const [a,b] of [[630,810],[990,1170]])for(let m=a;m<=b;m+=30){const t=new Date(day.getTime()+m*6e4);if(t<earliest)continue;const o=document.createElement('option');o.value=`${t.getMonth()+1}/${t.getDate()}（${wk[t.getDay()]}）${fmt(t)}`;o.textContent=fmt(t);g.appendChild(o)}
 if(g.children.length){sel.appendChild(g);n++}}}
 buildSlots();
+['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});
 function tmOk(){return !!document.getElementById('tm').value}
 function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){alert('請填姓名和電話');return false}return true}
 function copyOrder(){if(!ok())return;const t=txt();document.getElementById('preview').textContent=t;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert('已複製訂單，可貼到 LINE 傳給店家')).catch(()=>alert('請長按下方文字複製'))}
