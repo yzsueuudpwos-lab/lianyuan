@@ -64,7 +64,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <label>姓名</label><input id="nm" autocomplete="name">
 <label>電話</label><input id="ph" type="tel" autocomplete="tel">
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
-<label>取餐時間（10:00–14:00、16:00–19:00）</label><input id="tm" type="datetime-local" step="900"><p class="note" id="tmHint">晚上 19:00 後不接便當訂單；14:00–16:00 休息；週日休息</p>
+<label>取餐時間</label><select id="tm" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select><p class="note" id="tmHint">上午 10:30–13:30、下午 4:30–7:30 可取餐；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
 <p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <a class="btn line" id="lineBtn" href="#" onclick="return lineShare()" style="font-size:19px;padding:16px">💬 用 LINE 送出訂單</a>
@@ -92,11 +92,14 @@ function upd(){const n=q.reduce((a,b)=>a+b,0);document.getElementById('sum').tex
 function lines(){return M.map((m,i)=>q[i]?`${m[1]} x${q[i]} = $${m[2]*q[i]}`:null).filter(Boolean)}
 function openSheet(){if(!tot()){alert('請先選餐點');return}document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`;document.getElementById('sheet').style.display='block'}
 function txt(){const w='現場取餐',v=id=>document.getElementById(id).value.trim();
-return `【蓮緣素食 訂單】\n${lines().join('\n')}\n合計：$${tot()}\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm').replace('T',' ')}${v('nt')?'\n備註：'+v('nt'):''}`}
-function tmOk(){const v=document.getElementById('tm').value;const n=new Date();document.getElementById('tm').min=new Date(n-n.getTimezoneOffset()*6e4).toISOString().slice(0,16);if(!v)return true;const d=new Date(v),m=d.getHours()*60+d.getMinutes();
-if(d.getDay()==0){alert('週日休息（初一、十五照常營業，請來電確認）');return false}
-if(!((m>=600&&m<=840)||(m>=960&&m<=1140))){alert('可選時間：10:00–14:00、16:00–19:00（19:00 後不接便當訂單）');return false}return true}
-document.addEventListener('change',e=>{if(e.target.id=='tm'&&!tmOk())e.target.value=''});
+return `【蓮緣素食 訂單】\n${lines().join('\n')}\n合計：$${tot()}\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}`}
+function fmt(d){const h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return (h<12?'上午 ':'下午 ')+(h>12?h-12:h)+':'+m}
+function buildSlots(){const sel=document.getElementById('tm');sel.innerHTML='';const now=new Date(),earliest=new Date(now.getTime()+30*6e4);const wk='日一二三四五六';let n=0;
+for(let i=0;i<7&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0)continue;const g=document.createElement('optgroup');g.label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
+for(const [a,b] of [[630,810],[990,1170]])for(let m=a;m<=b;m+=30){const t=new Date(day.getTime()+m*6e4);if(t<earliest)continue;const o=document.createElement('option');o.value=`${t.getMonth()+1}/${t.getDate()}（${wk[t.getDay()]}）${fmt(t)}`;o.textContent=fmt(t);g.appendChild(o)}
+if(g.children.length){sel.appendChild(g);n++}}}
+buildSlots();
+function tmOk(){return !!document.getElementById('tm').value}
 function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){alert('請填姓名和電話');return false}return true}
 function copyOrder(){if(!ok())return;const t=txt();document.getElementById('preview').textContent=t;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert('已複製訂單，可貼到 LINE 傳給店家')).catch(()=>alert('請長按下方文字複製'))}
 function lineUrl(t){return 'https://line.me/R/oaMessage/@522ociyo/?'+encodeURIComponent(t)}
