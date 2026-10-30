@@ -107,6 +107,9 @@ body.setmode{background:#f2f2f7}body.setmode header{display:none}
 #ed .mvb{display:flex;gap:10px}#ed .mvb button{flex:1;min-height:52px;border:0;border-radius:12px;background:#fff;font-size:18px;color:#2e7d32}
 #ed .del{width:100%;min-height:56px;border:0;border-radius:14px;background:#fff;color:#ff3b30;font-size:19px;margin-top:18px}
 #toast{font-size:20px;bottom:calc(30px + env(safe-area-inset-bottom));z-index:60}
+.row .nm.wrap{white-space:normal;overflow:visible;line-height:1.3}
+.sbtn{flex:none;min-width:120px;min-height:52px;padding:8px 14px;border:0;border-radius:14px;font-size:19px;font-weight:700;color:#fff;background:#2e8b3d}.sbtn.x{background:#c0392b}
+@media(min-width:700px){.sbtn{min-width:180px;min-height:64px;font-size:24px}.row .nm{font-size:22px}}
 @media print{#setv,header,main,#pin,#toast{display:none!important}body{background:#fff}#labels{display:block}.lab{page-break-after:always;break-after:page}}
 </style></head><body>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
@@ -191,11 +194,13 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
  <div class="btns"><button class="ok" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','已接單')">✅ 接單並列印</button>
  <button class="no" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','售完')">❌ 售完</button></div></div>`).join(''):'<div class="empty">等待新訂單…</div>';
  $('done').innerHTML=d.done.map(o=>`<div class="done"><span>${{'已接單':'✅','售完':'❌','取消':'🚫'}[o.status]||''} ${esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜$${o.total}
- ${String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':'<span class="lno">請手動回覆</span>'}</span>
+ ${String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':`<span class="lno">請手動回覆${why(o.reply)?'（'+esc(why(o.reply))+'）':''}</span>`}</span>
  <span>${o.status=='已接單'?`<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
- $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}<br><button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('')}
+ $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}${manualWhy[id]?`<div style="font-size:22px;font-weight:400;margin-top:4px">原因：${esc(manualWhy[id])}</div>`:''}<button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('')}
 // ===== 上線／暫停接單 =====
-let ONLINE={open:false,why:'paused'};
+let ONLINE={open:false,why:'paused'},manualWhy={};
+// 後台回的 reply 例如「⚠ 取消 15:02 客人沒有在 LINE 傳訂單編號…」→ 只留原因
+function why(r){return String(r||'').replace(/^[⚠✅]\s*\S+\s+\d\d:\d\d\s*/,'').trim()}
 function showOnline(o){if(o)ONLINE=o;const b=$('onBtn');b.className=ONLINE.open?'on':'off';
  b.textContent=ONLINE.open?'🟢 接單中（按這裡暫停）':'🔴 暫停接單（按這裡上線）';
  $('onTip').textContent=ONLINE.open?'客人可以訂今天的便當。太忙就按上面暫停。':ONLINE.why=='late'?'已過 19:30，今天自動停止接單；預訂明天以後照常':'客人現在不能訂今天的；預訂明天以後照常'}
@@ -213,7 +218,7 @@ async function act(id,st){const o=find(id);if(!o)return;
  if(st=='已接單')printOrder(o); // 先印（要在按下按鈕的當下開 RawBT）
  busy[id]=1;render(data);
  api({action:'set',id,status:st}).then(r=>{const say={'已接單':'收到，請於 '+o.pickup+' 取餐。下次訂餐直接點👉 https://yzsueuudpwos-lab.github.io/lianyuan/','售完':'今天已售完，抱歉','取消':'訂單已取消'}[st];
- if(r.manual){manualMsg[id]=`${o.name}（編號 ${id}）→ 回「${say}」`;ding()}else delete manualMsg[id];
+ if(r.manual){manualMsg[id]=`${o.name}（編號 ${id}）→ 回「${say}」`;manualWhy[id]=why(r.reply);ding()}else delete manualMsg[id];
  toast(r.manual?'請手動在 LINE 回覆客人':st+'，已自動回覆 LINE ✅');delete busy[id];poll();quota.t=0})
  .catch(e=>{delete busy[id];render(data);say('請再按一次：'+e)})}
 function reprint(id){const o=find(id);if(o)printOrder(o)}
@@ -260,7 +265,7 @@ function tab(t){curTab=t;document.querySelectorAll('.tabs button').forEach(b=>b.
    h+=`<button class="day ${op?'op':'cl'}" onclick="flip('${k}')"><small>${d.getMonth()+1}月</small><b>${d.getDate()}</b><small>${op?'接預訂':'不接'}${lu==1?'・初一':lu==15?'・十五':''}</small>${bk?`<small>已訂 ${bk} 個</small>`:''}<span class="cap" onclick="event.stopPropagation();setCap('${k}')">${o.cap?'上限 '+o.cap:'上限：不限'}</span></button>`}
   B.innerHTML=h+'</div>'}
  if(t=='menu')menuTab();
- if(t=='sold'){B.innerHTML='<div class="tip">打開紅色開關＝<b>今天賣完</b>：客人不能選今天取餐，明天以後和預訂照常；<b>明天自動恢復</b>。</div><div class="grp">'+soldList().map((m,i)=>{const x=!!ST.soldOut[m[1]];return `<div class="row it"><div class="tx"><div class="nm">${esc(m[1])}</div><div class="sub">${x?'<span class="lt">⛔ 今天賣完</span>':'✅ 有賣'}</div></div><div class="swwrap"><button class="sw red so ${x?'on x':''}" onclick="sold(${i},${!x})" aria-label="賣完"></button></div></div>`}).join('')+'</div>'}
+ if(t=='sold'){B.innerHTML='<div class="tip">按右邊按鈕切換。紅色＝<b>今天賣完</b>：客人不能選今天取餐，明天以後和預訂照常；<b>明天自動恢復</b>。</div><div class="grp">'+soldList().map((m,i)=>{const x=!!ST.soldOut[m[1]];return `<div class="row srow"><div class="tx"><div class="nm wrap">${esc(m[1])}</div></div><button class="sbtn ${x?'x':''}" onclick="sold(${i},${!x})">${x?'⛔ 賣完':'✅ 有賣'}</button></div>`}).join('')+'</div>'}
  $('navR').style.visibility=t=='menu'?'visible':'hidden'}
 function flip(k){const [y,m,d]=k.split('-').map(Number),dt=new Date(y,m-1,d),o=ST.days[k]||{},op=o.off?false:o.on?true:baseOpen(dt),cap=+o.cap||0;
  let v=op?{off:true,cap}:(baseOpen(dt)?{cap}:{on:true,cap});if(!v.off&&!v.on&&!cap)v=null;save({days:{[k]:v}},op?`${m}/${d} 改成不接預訂`:`${m}/${d} 改成接預訂`)}
