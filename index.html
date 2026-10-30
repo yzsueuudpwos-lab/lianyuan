@@ -43,6 +43,7 @@ label{display:block;margin:10px 0 4px;font-size:14px}input,select,textarea{width
 .btn{display:block;width:100%;text-align:center;padding:14px;border-radius:12px;border:0;font-size:17px;font-weight:700;margin-top:10px;text-decoration:none}
 .line{background:#06c755;color:#fff}.dis{background:#bbb;color:#fff}.tel{background:#fff;color:var(--g);border:2px solid var(--g)}.copy{background:var(--o);color:#fff}
 pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font-size:14px}
+.card.so img{filter:grayscale(1);opacity:.6}.card.so .row{flex-wrap:wrap;gap:6px}.sold{background:#999;color:#fff;border-radius:14px;padding:6px 12px;font-size:15px;font-weight:700}
 .tbd{color:#c00;font-weight:700}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
 </style></head><body>
@@ -53,7 +54,8 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <section id="how"><h2>訂購方式</h2><p class="note">選好餐點 → 填資料 → 用 LINE 或電話送出</p>
 <div class="steps"><div><b>1</b>選餐點</div><div><b>2</b>填姓名電話</div><div><b>3</b>送出訂單</div><div><b>4</b>店家回覆「收到」</div></div>
 <p class="note" style="margin-top:10px;color:#c8702a;font-weight:700">⏰ 中午最多人訂，請提早預訂！晚上 19:00 後不接便當訂單</p>
-<p class="note">🏪 目前只提供現場取餐</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p></section>
+<p class="note">🏪 目前只提供現場取餐</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
+<p class="note">📅 <b>10 個以上請預訂</b>：前一天下午 3 點前訂；30 個以上前兩天、50 個以上前三天；最多可訂 30 天內。30 個以上需付 30% 訂金或電話確認，前一天以前取消全額退款。</p></section>
 
 <section id="c1"><h2>人氣餐盒</h2><p class="note">純素料理｜配菜依當日時蔬，與照片不一定相同</p><div id="l1"></div></section>
 <section id="c2"><h2>套餐</h2><p class="note">附湯，菜由店家自行選配</p><div id="l2"></div></section>
@@ -74,7 +76,9 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <label>姓名</label><input id="nm" name="name" autocomplete="name">
 <label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
-<label>取餐時間</label><select id="tm" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select><p class="note" id="tmHint">上午 10:30–13:30、下午 4:30–7:30 可取餐；週日休息</p>
+<div id="preBox" style="display:none"><div class="info" id="preRule" style="background:#fff3e6;font-size:14px;line-height:1.6"></div>
+<label>預訂日期</label><select id="pd" onchange="preTimes()" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select></div>
+<label>取餐時間</label><select id="tm" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="tmHint">上午 10:30–13:30、下午 4:30–7:30 可取餐；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
 <p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <a class="btn line" id="lineBtn" href="#" onclick="lineShare();return false" style="font-size:19px;padding:16px">💬 用 LINE 送出訂單</a>
@@ -82,49 +86,76 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <button class="btn copy" onclick="copyOrder()">📋 複製訂單文字</button>
 <a class="btn tel" href="tel:0227038823">📞 打電話訂餐 02-2703-8823</a>
 <pre id="preview"></pre></div></div>
+<script src="menu.js"></script>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上）
-const M=[
-[1,'養生十穀米餐盒',150,'十穀米飯搭配蓮藕片、香菇、南瓜、四季豆、花椰菜、青菜與蔬菜卷，再添多色時蔬配菜。','養生十穀米餐盒'],
-[1,'精緻白飯餐盒',150,'飽滿白飯鋪上黑芝麻，搭配花椰菜、木耳、筍絲、紅蘿蔔絲、彩椒等。','精緻白飯餐盒'],
-[1,'炒米粉餐盒',150,'炒米粉主食，搭配香菇與時蔬，配菜含花椰菜、紫高麗菜、南瓜、蓮藕與金黃點心。','炒米粉餐盒'],
-[1,'炒麵餐盒',150,'炒麵為主，搭配多樣蔬菜與配菜，份量飽足。','炒麵餐盒'],
-[1,'精緻點心餐盒',170,'蔬菜壽司卷、芝麻飯捲、小方點心、炸物與烘焙點心。','精緻點心餐盒'],
-[2,'套餐A',150,'附湯。菜由店家自行選配。','套餐A'],[2,'套餐B',160,'附湯。菜由店家自行選配。',''],
-[2,'套餐C',170,'附湯。菜由店家自行選配。',''],[2,'套餐D',180,'附湯。菜由店家自行選配。',''],
-[3,'龜苓膏',80,'傳統草本龜苓膏，口感滑嫩。','龜苓膏'],[3,'白飯',25,'鬆軟香Q的白飯。',''],
-[3,'五穀飯',25,'多穀物混合米飯，穀香豐富。',''],[3,'純炒麵',150,'只炒麵條，無加配料，簡單調味。','純炒麵'],
-[3,'純米粉',150,'純米細米粉，口感滑順。','']];
+const M=MENU.map(m=>m.slice());
 const q=M.map(()=>0);
-M.forEach((m,i)=>{document.getElementById('l'+m[0]).insertAdjacentHTML('beforeend',`<div class="card">${m[4]?`<img loading="lazy" src="${m[4]}.jpg" alt="${m[1]}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${m[1]}</h3><p>${m[3]}</p><div class="row"><span class="price">$${m[2]}</span><div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><span id="q${i}">0</span><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)});
+let S={price:{},photo:{},soldOut:{},days:{},booked:{}};
+const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function imgOf(m){const u=S.photo[m[1]];return /^https:\/\/lh3\.googleusercontent\.com\//.test(u||'')?u:(m[4]?m[4]+'.jpg':'')}
+function render(){[1,2,3].forEach(c=>document.getElementById('l'+c).innerHTML='');
+M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m);document.getElementById('l'+m[0]).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3><p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><span id="q${i}">${q[i]}</span><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
+render();
+// 讀店家設定（價錢、照片、今天賣完、預訂日曆）；讀不到就用 menu.js 的預設值
+function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
+ function clean(){clearTimeout(t);delete window[cb];sc.remove()}window[cb]=d=>{clean();d&&d.ok?res(d):rej(d&&d.error)};sc.onerror=()=>{clean();rej('net')};
+ sc.src=GAS_URL+'?'+new URLSearchParams({...p,callback:cb,_:Date.now()});document.body.appendChild(sc)})}
+function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];m[2]=p>0?p:MENU[i][2];});render();upd()}).catch(()=>{})}
+loadS();
 function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.max(0,q[i]+d);document.getElementById('q'+i).textContent=q[i];upd()}
 function tot(){return M.reduce((s,m,i)=>s+m[2]*q[i],0)}
+function cnt(){return q.reduce((a,b)=>a+b,0)}
 function upd(){const n=q.reduce((a,b)=>a+b,0);document.getElementById('sum').textContent=n?`共 ${n} 份｜$${tot()}`:'尚未選餐'}
 function lines(){return M.map((m,i)=>q[i]?`${m[1]} x${q[i]} = $${m[2]*q[i]}`:null).filter(Boolean)}
-function openSheet(){if(!tot()){alert('請先選餐點');return}document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`;document.getElementById('sheet').style.display='block'}
+function openSheet(){if(!tot()){alert('請先選餐點');return}setMode();document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`;document.getElementById('sheet').style.display='block'}
 function txt(){const w='現場取餐',v=id=>document.getElementById(id).value.trim();
 if(!window.OID)window.OID=String(Date.now()).slice(-6)+Math.floor(Math.random()*10); // 客人端 token
-return `【蓮緣素食 訂單】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}`}
+const n=cnt(),pre=n>=PRE_MIN;
+return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ 30 個以上：付 30% 訂金或店家電話確認後才成立':''}`}
 function fmt(d){const h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return (h<12?'上午 ':'下午 ')+(h>12?h-12:h)+':'+m}
-function buildSlots(){const sel=document.getElementById('tm');sel.innerHTML='';const now=new Date(),earliest=new Date(now.getTime()+30*6e4);const wk='日一二三四五六';let n=0;
-for(let i=0;i<7&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0)continue;const g=document.createElement('optgroup');g.label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
+function buildSlots(){const sel=document.getElementById('tm');sel.innerHTML='';const now=new Date(),earliest=new Date(now.getTime()+30*6e4);const wk='日一二三四五六';let n=0;const soT=M.some((m,i)=>q[i]&&S.soldOut[m[1]]);document.getElementById('soHint').style.display=soT?'block':'none';
+for(let i=0;i<7&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0||(i==0&&soT))continue;const g=document.createElement('optgroup');g.label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
 for(const [a,b] of [[630,810],[990,1170]])for(let m=a;m<=b;m+=30){const t=new Date(day.getTime()+m*6e4);if(t<earliest)continue;const o=document.createElement('option');o.value=`${t.getMonth()+1}/${t.getDate()}（${wk[t.getDay()]}）${fmt(t)}`;o.textContent=fmt(t);g.appendChild(o)}
 if(g.children.length){sel.appendChild(g);n++}}}
 buildSlots();
+// ===== 預訂（10 個以上）=====
+const PRE_MIN=10,PRE_DAYS=30,CUTOFF=15,SLOTS=[[630,810],[990,1170]],WK='日一二三四五六';
+const LF=(()=>{try{return new Intl.DateTimeFormat('zh-TW-u-ca-chinese',{day:'numeric'})}catch(e){return null}})();
+function lunarDay(d){try{const p=LF&&LF.formatToParts(d).find(x=>x.type=='day');return p?parseInt(p.value,10):0}catch(e){return 0}}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function lead(n){return n>=50?3:n>=30?2:1}
+function baseOpen(d){return d.getDay()!=0||[1,15].includes(lunarDay(d))} // 週日休，初一十五照開
+function dayOpen(d){const o=S.days[ymd(d)]||{};return o.off?false:o.on?true:baseOpen(d)}
+function preDates(n){const now=new Date(),out=[];
+ for(let i=1;i<=PRE_DAYS;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i),k=ymd(d);
+  if(i<lead(n)||(i==lead(n)&&now.getHours()>=CUTOFF)||!dayOpen(d))continue;
+  const cap=+(S.days[k]||{}).cap||0,left=cap?cap-(+S.booked[k]||0):null;out.push({d,k,left,full:left!==null&&left<n})}return out}
+function setMode(){const n=cnt(),pre=n>=PRE_MIN,box=document.getElementById('preBox');box.style.display=pre?'block':'none';document.getElementById('tmHint').style.display=pre?'none':'block';
+ if(!pre){buildSlots();return}
+ const L=preDates(n),pd=document.getElementById('pd'),old=pd.value;
+ pd.innerHTML=L.map(x=>`<option value="${x.k}" ${x.full?'disabled':''}>${x.d.getMonth()+1}/${x.d.getDate()}（${WK[x.d.getDay()]}）${[1,15].includes(lunarDay(x.d))?(lunarDay(x.d)==1?' 初一':' 十五'):''}${x.full?` 只剩 ${Math.max(0,x.left)} 個（不夠）`:x.left!==null?` 還可訂 ${x.left} 個`:''}</option>`).join('');
+ if(L.some(x=>x.k==old&&!x.full))pd.value=old;else{const f=L.find(x=>!x.full);pd.value=f?f.k:''}
+ const k=lead(n);document.getElementById('preRule').innerHTML=`📅 <b>${n} 個 = 預訂單</b>：要在取餐日的<b>${k==1?'前一天':k==2?'前兩天':'前三天'} 下午 3 點前</b>訂，最多可訂 30 天內。`+
+  (n>=30?'<br>💰 30 個以上：需付 <b>30% 訂金</b>（約 $'+Math.round(tot()*0.3)+'）或由店家<b>電話確認</b>後才成立。':'')+'<br>↩ 取餐<b>前一天</b>以前取消，訂金全額退還。';
+ preTimes()}
+function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
+ for(const [a,b] of SLOTS)for(let x=a;x<=b;x+=30){const t=new Date(day.getTime()+x*6e4),o=document.createElement('option');o.value=`${t.getMonth()+1}/${t.getDate()}（${WK[t.getDay()]}）${fmt(t)}`;o.textContent=fmt(t);sel.appendChild(o)}}
 ['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});
-function tmOk(){return !!document.getElementById('tm').value}
+function tmOk(){if(!document.getElementById('tm').value){alert(cnt()>=PRE_MIN?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
 function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){alert('請填姓名和電話');return false}return true}
 function copyOrder(){if(!ok())return;const t=txt();document.getElementById('preview').textContent=t;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert('已複製訂單，可貼到 LINE 傳給店家')).catch(()=>alert('請長按下方文字複製'))}
 function lineUrl(t){return 'https://line.me/R/oaMessage/@522ociyo/?'+encodeURIComponent(t)}
 // 送單給後端，取回店家編號（MMDD-NNN）；失敗或逾時就用 token 當編號，點餐不中斷
 async function sendGas(){if(!GAS_URL)return;txt();const v=id=>document.getElementById(id).value.trim();
- const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
+ const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),date:cnt()>=PRE_MIN?v('pd'):'',total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
  const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),6000);
  try{const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),signal:ac&&ac.signal});
-  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id))window.SID=d.id}catch(e){}finally{clearTimeout(tm)}}
+  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id))window.SID=d.id;else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
 let sending=false;
 async function lineShare(){if(sending||!ok())return false;const b=document.getElementById('lineBtn'),old=b.textContent;
  sending=true;b.textContent='⏳ 傳送中…';b.style.opacity=.6;
- try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity=''}
+ window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity=''}
+ if(window.PREERR){alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
  location.href=lineUrl(txt());return false}
 </script></body></html>
