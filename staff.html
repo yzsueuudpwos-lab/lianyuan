@@ -7,6 +7,8 @@
 body{margin:0;font-family:"Noto Sans TC","PingFang TC",sans-serif;background:#f5f5f0;color:#222;font-size:26px}
 header{background:#3f7d3a;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5}
 header b{font-size:34px}#stat{font-size:28px}#conn{font-size:20px}
+#onBtn{display:block;width:100%;font-size:44px;font-weight:700;padding:34px 10px;border:6px solid #fff;border-radius:24px;color:#fff;margin:0 0 8px;box-shadow:0 4px 12px #0003}
+#onBtn.on{background:#2e8b3d}#onBtn.off{background:#c0392b}#onTip{font-size:24px;color:#555;text-align:center;margin-bottom:16px}
 main{padding:14px;max-width:900px;margin:auto}
 .remind{background:#fff3c4;border:3px solid #e0a800;border-radius:16px;padding:14px;font-size:28px;margin-bottom:14px;line-height:1.4}
 .card{background:#fff;border-radius:20px;box-shadow:0 2px 8px #0002;padding:18px;margin-bottom:18px;border-left:12px solid #e07a1f}
@@ -53,6 +55,7 @@ h2{font-size:28px;color:#555;margin:26px 0 8px}.done{background:#fff;border-radi
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
 <header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
 <main>
+<button id="onBtn" class="off" onclick="toggleOnline()">🔴 暫停接單（按這裡上線）</button><div id="onTip">今天還沒上線，客人只能預訂明天以後</div>
 <div id="manual"></div>
 <div id="list"><div class="empty">等待新訂單…</div></div>
 <h2>今天處理過的</h2><div id="done"></div>
@@ -91,7 +94,7 @@ document.addEventListener('click',unlockAudio);
 async function wake(){try{if(navigator.wakeLock)await navigator.wakeLock.request('screen')}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){wake();poll()}});
 function parseItems(s){return String(s).split('\n').map(l=>{const m=l.match(/^(.+?)\s*x(\d+)\s*$/);return m?{n:m[1].trim(),q:+m[2]}:null}).filter(Boolean)}
-function render(d){data=d;$('stat').textContent=`今天：${d.count} 份｜$${d.total}`;$('conn').textContent='✅ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent=`今天：${d.count} 份｜$${d.total}`;$('conn').textContent='✅ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
  const ids=d.pending.map(o=>o.id);if(seen&&ids.some(i=>!seen.has(i)))ding();seen=new Set(ids);
  document.title=(ids.length?`(${ids.length}) `:'')+'蓮緣接單';
  $('list').innerHTML=d.pending.length?d.pending.map(o=>`<div class="card"><div class="who">${esc(o.name)}　<span class="sm">${esc(o.phone)}</span></div>
@@ -103,6 +106,14 @@ function render(d){data=d;$('stat').textContent=`今天：${d.count} 份｜$${d.
  ${String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':'<span class="lno">請手動回覆</span>'}</span>
  <span>${o.status=='已接單'?`<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
  $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}<br><button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('')}
+// ===== 上線／暫停接單 =====
+let ONLINE={open:false,why:'paused'};
+function showOnline(o){if(o)ONLINE=o;const b=$('onBtn');b.className=ONLINE.open?'on':'off';
+ b.textContent=ONLINE.open?'🟢 接單中（按這裡暫停）':'🔴 暫停接單（按這裡上線）';
+ $('onTip').textContent=ONLINE.open?'客人可以訂今天的便當。太忙就按上面暫停。':ONLINE.why=='late'?'已過 19:30，今天自動停止接單；預訂明天以後照常':'客人現在不能訂今天的；預訂明天以後照常'}
+function toggleOnline(){const want=!ONLINE.open;if(!want&&!confirm('確定暫停接今天的單？\n（預訂明天以後照常）'))return;
+ $('onBtn').disabled=true;api({action:'online',on:want?1:0}).then(r=>{showOnline(r.online);toast(r.online.open?'已上線，開始接今天的單 ✅':want?'已過 19:30，今天不能再上線':'已暫停接今天的單')})
+ .catch(e=>alert('沒有存到，請再按一次：'+e)).finally(()=>$('onBtn').disabled=false)}
 function quota(){api({action:'quota'}).then(q=>{$('quota').textContent=q.enabled===false?'':q.limit?`LINE 本月 ${q.used}/${q.limit} 則`:(q.used!=null?`LINE 本月 ${q.used} 則`:'')}).catch(()=>{})}
 function poll(){if(!PIN||!GAS_URL)return;api({action:'list'}).then(render).catch(e=>{if(e=='pin'){localStorage.removeItem('ly_pin');location.reload()}$('conn').textContent='⚠ '+e})}
 function start(){wake();poll();setInterval(poll,POLL);quota();setInterval(quota,600000)}
