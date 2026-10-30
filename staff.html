@@ -112,7 +112,7 @@ function act(id,st){const o=find(id);if(!o)return;
  if(st=='取消'&&!confirm(`確定要取消 ${o.name} 的訂單（編號 ${o.id}）？\n會自動用 LINE 通知客人`))return;
  if(st=='已接單')printOrder(o); // 先印（要在按下按鈕的當下開 RawBT）
  busy[id]=1;render(data);
- api({action:'set',id,status:st}).then(r=>{const say={'已接單':'收到，請於 '+o.pickup+' 取餐','售完':'今天已售完，抱歉','取消':'訂單已取消'}[st];
+ api({action:'set',id,status:st}).then(r=>{const say={'已接單':'收到，請於 '+o.pickup+' 取餐。下次訂餐直接點👉 https://yzsueuudpwos-lab.github.io/lianyuan/','售完':'今天已售完，抱歉','取消':'訂單已取消'}[st];
  if(r.manual){manualMsg[id]=`${o.name}（編號 ${id}）→ 回「${say}」`;ding()}else delete manualMsg[id];
  toast(r.manual?'請手動在 LINE 回覆客人':st+'，已自動回覆 LINE ✅');delete busy[id];poll();quota.t=0})
  .catch(e=>{delete busy[id];render(data);alert('沒有存到，請再按一次：'+e)})}
