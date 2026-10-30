@@ -1,5 +1,5 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>蓮緣接單</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#3f7d3a">
 <link rel="icon" href="icon.png"><script src="menu.js"></script><link rel="apple-touch-icon" href="icon.png">
 <style id="pagecss">@page{size:40mm 30mm;margin:0}</style>
@@ -56,20 +56,57 @@ h2{font-size:28px;color:#555;margin:26px 0 8px}.done{background:#fff;border-radi
 .mdl .bb{display:flex;gap:16px;margin-top:22px}.mdl .bb button{flex:1;font-size:34px;font-weight:700;padding:26px 8px;border:0;border-radius:20px;color:#fff}
 .mdl .cn{background:#9a9a9a}.mdl .rd{background:#c0392b}.mdl .gr{background:#2e8b3d}.mdl .or{background:#e07a1f}
 .mdl input.num{font-size:44px;width:220px;text-align:center;padding:12px;border-radius:14px;border:3px solid #3f7d3a;margin-top:10px}
-#ed .bx{text-align:left}#ed label{display:block;font-size:26px;font-weight:700;margin:16px 0 6px;color:#3f7d3a}
-#ed input[type=text],#ed input[type=date],#ed textarea,#ed select{width:100%;box-sizing:border-box;font-size:28px;padding:12px;border:2px solid #aaa;border-radius:14px;font-family:inherit}
-#ed .prow{display:flex;gap:10px;align-items:center}#ed .prow input{flex:1;text-align:center;font-size:36px;font-weight:700}
-#ed .prow button{font-size:30px;font-weight:700;width:96px;padding:14px 0;border:0;border-radius:14px;color:#fff;background:#c0392b}#ed .prow button.up{background:#2e8b3d}
-#ed .pic{display:flex;gap:14px;align-items:center}#ed .pic img{width:180px;height:135px;object-fit:cover;border-radius:14px;background:#eee}
-#ed .ck{display:flex;align-items:center;gap:12px;font-size:28px;font-weight:700;margin-top:18px;color:#c0392b}#ed .ck input{width:40px;height:40px}
-.mi{background:#fff;border-radius:18px;padding:14px;margin-bottom:12px;display:flex;gap:14px;align-items:center;border-left:12px solid #2e8b3d}
-.mi.off{border-left-color:#aaa;opacity:.65}.mi img,.mi .noimg{width:130px;height:98px;object-fit:cover;border-radius:12px;background:#eee;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;color:#888}
-.mi .tx{flex:1;min-width:0}.mi .nm{font-size:32px;font-weight:700}.mi .sub{font-size:22px;color:#555;margin-top:4px}
-.mi .tag{display:inline-block;font-size:20px;font-weight:700;border-radius:8px;padding:2px 10px;margin-right:6px;color:#fff;background:#2e8b3d}.mi .tag.x{background:#888}.mi .tag.l{background:#c0392b}
-.mi .ac{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:none}.mi .ac button{font-size:24px;font-weight:700;padding:14px 12px;border:0;border-radius:12px;color:#fff;background:#3f7d3a;min-width:100px}
-.mi .ac .mv{background:#e9e9e2;color:#333}.mi .ac .dn{background:#888}.mi .ac .upn{background:#2e8b3d}
-.mbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}.mbar button{flex:1;min-width:200px;font-size:28px;font-weight:700;padding:20px 10px;border:0;border-radius:16px;color:#fff;background:#3f7d3a}
-.mbar .gy{background:#888}.mbar .gn{background:#2e8b3d}
+/* ===== ⚙ 店家設定：iPhone 設定 App 風格（平板也置中好看）===== */
+body.setmode{background:#f2f2f7}body.setmode header{display:none}
+#setv{padding:0 0 calc(24px + env(safe-area-inset-bottom));max-width:680px;font-size:17px;-webkit-text-size-adjust:100%}
+.nav{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f2f2f7ee;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+ padding:calc(8px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left));border-bottom:1px solid #d1d1d6}
+.nav b{font-size:20px}.nav button{min-height:48px;min-width:80px;font-size:18px;border:0;background:none;color:#2e7d32;font-weight:600;padding:0 6px}.nav button.r{text-align:right}
+.tabs{display:flex;gap:0;background:#e3e3e8;border-radius:12px;padding:3px;margin:12px calc(14px + env(safe-area-inset-right)) 6px calc(14px + env(safe-area-inset-left))}
+.tabs button{flex:1;min-height:48px;font-size:17px;font-weight:600;border:0;border-radius:10px;background:none;color:#222;padding:4px 2px}.tabs button.on{background:#fff;color:#2e7d32;box-shadow:0 1px 4px #0002}
+#setBody{padding:0 calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
+.tip{font-size:16px;color:#6d6d72;margin:10px 4px 8px;line-height:1.45}
+.grp{background:#fff;border-radius:14px;overflow:hidden;overflow:clip;margin-bottom:18px}
+.gh{font-size:14px;color:#6d6d72;margin:18px 6px 6px;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 14px;border-bottom:1px solid #e5e5ea;width:100%;box-sizing:border-box;background:#fff;text-align:left;font:inherit;color:inherit;border-left:0;border-right:0;border-top:0}
+.row:last-child{border-bottom:0}.row:active{background:#e5e5ea}
+.row .th{width:60px;height:60px;border-radius:10px;object-fit:cover;background:#eee;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px}
+.row .tx{flex:1;min-width:0}.row .nm{font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .sub{font-size:15px;color:#6d6d72;margin-top:3px}.row .sub b{color:#c05800}.row.off .nm,.row.off .th{opacity:.45}
+.row .chev{color:#c7c7cc;font-size:28px;flex:none}.row .lt{color:#c0392b;font-weight:700}
+.act{color:#2e7d32;font-size:19px;font-weight:600;justify-content:center}.act.red{color:#c0392b}
+.sw{position:relative;width:62px;height:38px;flex:none;border:0;border-radius:19px;background:#e5e5ea;padding:0;transition:.2s}.sw::after{content:'';position:absolute;top:3px;left:3px;width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 2px 4px #0003;transition:.2s}
+.sw.on{background:#34c759}.sw.on::after{left:27px}.sw.red.on{background:#ff3b30}
+.swwrap{min-width:62px;min-height:48px;display:flex;align-items:center;justify-content:center;flex:none}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:#fff;border-radius:14px;padding:8px}
+.cal .wk{text-align:center;font-size:14px;color:#6d6d72}
+.day{border-radius:10px;padding:6px 1px;text-align:center;font-size:12px;border:0;min-height:88px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:1px}
+.day b{font-size:22px}.day.op{background:#34a853}.day.cl{background:#b0b0b5}.day.na{background:transparent}.day small{font-size:12px}
+.day .cap{margin-top:auto;font-size:12px;background:#fff;color:#333;border-radius:6px;padding:4px 2px;min-height:24px;width:94%;box-sizing:border-box}
+@media(min-width:700px){.day{min-height:110px;font-size:15px}.day b{font-size:28px}.day small,.day .cap{font-size:15px}}
+/* 底部抽屜（編輯餐點）*/
+#ed{position:fixed;inset:0;z-index:40;display:none;background:#0006;align-items:flex-end;justify-content:center}
+#ed .sheet{background:#f2f2f7;width:100%;max-width:680px;max-height:94vh;max-height:94dvh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;animation:up .25s ease-out;box-shadow:0 -6px 30px #0004}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+#ed .sh{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-bottom:1px solid #d1d1d6;background:#f9f9f9;border-radius:16px 16px 0 0;flex:none}
+#ed .sh b{font-size:19px}#ed .sh button{min-height:48px;min-width:80px;border:0;background:none;font-size:18px;color:#2e7d32}#ed .sh .done{font-weight:700}
+#ed .sc{overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 10px;flex:1}
+#ed .ft{flex:none;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#f9f9f9;border-top:1px solid #d1d1d6}
+#ed .ft button{width:100%;min-height:56px;font-size:20px;font-weight:700;border:0;border-radius:14px;background:#2e7d32;color:#fff}
+#ed .f{display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 14px;border-bottom:1px solid #e5e5ea;background:#fff}#ed .f:last-child{border-bottom:0}
+#ed .f>span{width:64px;flex:none;font-size:17px;color:#333}
+#ed input[type=text],#ed input[type=date],#ed textarea,#ed select{flex:1;min-width:0;font-size:18px;border:0;background:transparent;padding:10px 0;font-family:inherit;color:#000;min-height:44px;-webkit-appearance:none;appearance:none}
+#ed textarea{resize:vertical;line-height:1.4}#ed select{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='2' fill='none'/%3E%3C/svg%3E") right center no-repeat}
+#ed .prow{display:flex;gap:8px;align-items:center;flex:1;min-width:0}#ed .prow input{width:0}#ed .sc{overflow-x:hidden}#ed textarea{border:0!important;outline:0;box-shadow:none}#ed .prow input{text-align:center;font-size:22px!important;font-weight:700;background:#f2f2f7!important;border-radius:10px;padding:8px!important}
+#ed .prow button{min-width:56px;min-height:48px;font-size:18px;font-weight:700;border:0;border-radius:10px;background:#e5e5ea;color:#222}
+#ed .pic{background:#fff;border-radius:14px;padding:12px;margin-bottom:6px}
+#ed .pic img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:#e5e5ea}
+#ed .pic .nopic{width:100%;aspect-ratio:4/3;border-radius:10px;background:#e5e5ea;display:flex;align-items:center;justify-content:center;color:#8e8e93;font-size:18px}
+#ed .pbtn{display:flex;gap:10px;margin-top:10px}#ed .pbtn button{flex:1;min-height:60px;border:0;border-radius:12px;font-size:19px;font-weight:700;background:#2e7d32;color:#fff}#ed .pbtn button.g2{background:#e8f3e8;color:#2e7d32}
+#ePicSt{font-size:16px;color:#6d6d72;margin-top:8px;min-height:20px}#ePicSt.bad{color:#c0392b}
+#ed .mvb{display:flex;gap:10px}#ed .mvb button{flex:1;min-height:52px;border:0;border-radius:12px;background:#fff;font-size:18px;color:#2e7d32}
+#ed .del{width:100%;min-height:56px;border:0;border-radius:14px;background:#fff;color:#ff3b30;font-size:19px;margin-top:18px}
+#toast{font-size:20px;bottom:calc(30px + env(safe-area-inset-bottom));z-index:60}
 @media print{#setv,header,main,#pin,#toast{display:none!important}body{background:#fff}#labels{display:block}.lab{page-break-after:always;break-after:page}}
 </style></head><body>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
@@ -86,25 +123,34 @@ h2{font-size:28px;color:#555;margin:26px 0 8px}.done{background:#fff;border-radi
 　<button onclick="testPrint()">印測試張</button> <button onclick="localStorage.removeItem('ly_pin');location.reload()">換密碼</button></div>
 </main>
 <div id="setv">
-<div class="tabs"><button data-t="menu" onclick="tab('menu')">🍱 菜單管理</button><button data-t="cal" onclick="tab('cal')">📅 預訂日期</button><button data-t="sold" onclick="tab('sold')">⛔ 今天賣完</button></div>
+<div class="nav"><button onclick="showSet(false)">‹ 接單</button><b>店家設定</b><button class="r" id="navR" onclick="edOpen(-1)">＋ 新增</button></div>
+<div class="tabs"><button data-t="menu" onclick="tab('menu')">🍱 菜單</button><button data-t="cal" onclick="tab('cal')">📅 預訂日期</button><button data-t="sold" onclick="tab('sold')">⛔ 今天賣完</button></div>
 <div id="setBody"></div>
-<button class="save" style="background:#3f7d3a" onclick="showSet(false)">⬅ 回到接單</button>
-<input type="file" id="pic" accept="image/*" style="display:none" onchange="gotPic(this)">
+<input type="file" id="pic" accept="image/*" capture="environment" style="display:none" onchange="gotPic(this)">
+<input type="file" id="pic2" accept="image/*" style="display:none" onchange="gotPic(this)">
 </div>
 <div id="labels"></div><div id="toast"></div>
 <div class="mdl" id="ask"><div class="bx"><div class="ic" id="askIc"></div><h3 id="askT"></h3><div class="ms" id="askM"></div><div id="askIn"></div><div class="bb" id="askB"></div></div></div>
-<div class="mdl" id="ed"><div class="bx"><h3 class="g" id="edT" style="text-align:center">編輯餐點</h3>
-<label>品名</label><input type="text" id="eName" maxlength="30">
-<label>價錢</label><div class="prow"><button onclick="ePrice(-10)">−10</button><input type="text" id="ePrice" inputmode="numeric" pattern="[0-9]*" maxlength="4" onfocus="this.select()"><button class="up" onclick="ePrice(10)">+10</button></div>
-<label>分類</label><select id="eCat" onchange="$('eCatNew').style.display=this.value=='+'?'block':'none'"></select><input type="text" id="eCatNew" maxlength="12" placeholder="輸入新分類，例如：過年預購" style="display:none;margin-top:8px">
-<label>說明</label><textarea id="eDesc" rows="3" maxlength="200"></textarea>
-<label>照片</label><div class="pic"><img id="ePic" alt=""><div><button class="ph" onclick="pickPic()">📷 拍照／選照片</button><div id="ePicSt" style="font-size:22px;color:#555;margin-top:6px"></div></div></div>
-<div class="ck"><input type="checkbox" id="eLim" onchange="$('eLimBox').style.display=this.checked?'block':'none'"><label for="eLim" style="margin:0;color:#c0392b">🧧 限定期間／預購專用</label></div>
-<div id="eLimBox" style="display:none"><div class="tip" style="margin:6px 0">客人只能選這段日子取餐（例如過年預購）；過了結束日自動下架</div>
-<label>開始取餐日</label><input type="date" id="eFrom"><label>最後取餐日</label><input type="date" id="eTo"></div>
-<div class="ck" style="color:#2e8b3d"><input type="checkbox" id="eOn"><label for="eOn" style="margin:0">✅ 上架（客人看得到）</label></div>
-<div class="bb"><button class="cn" onclick="edClose()">取消</button><button class="gr" onclick="edOk()">完成</button></div>
-<div class="bb" id="eDelBox"><button class="rd" style="font-size:26px;padding:16px" onclick="edDel()">🗑 刪除這個餐點</button></div></div></div>
+<div id="ed" onclick="if(event.target==this)edClose()"><div class="sheet">
+<div class="sh"><button onclick="edClose()">取消</button><b id="edT">編輯餐點</b><button class="done" onclick="edOk()">儲存</button></div>
+<div class="sc">
+<div class="gh">照片</div><div class="pic"><img id="ePic" alt=""><div class="nopic" id="eNoPic">還沒有照片</div>
+<div class="pbtn"><button class="ph" onclick="pickPic(1)">📷 拍照</button><button class="g2" onclick="pickPic(0)">🖼 從相簿選</button></div><div id="ePicSt"></div></div>
+<div class="gh">基本資料</div><div class="grp">
+<label class="f"><span>品名</span><input type="text" id="eName" maxlength="30" placeholder="例如：過年發財盒"></label>
+<div class="f"><span>價錢</span><div class="prow"><button onclick="ePrice(-10)">−10</button><input type="text" id="ePrice" inputmode="numeric" pattern="[0-9]*" maxlength="4" onfocus="this.select()"><button class="up" onclick="ePrice(10)">+10</button></div></div>
+<label class="f"><span>分類</span><select id="eCat" onchange="$('eCatNewRow').style.display=this.value=='+'?'flex':'none'"></select></label>
+<label class="f" id="eCatNewRow" style="display:none"><span>新分類</span><input type="text" id="eCatNew" maxlength="12" placeholder="例如：過年預購"></label>
+<label class="f"><span>說明</span><textarea id="eDesc" rows="3" maxlength="200" placeholder="（可不填）"></textarea></label></div>
+<div class="grp"><div class="f"><span style="flex:1;width:auto">✅ 上架（客人看得到）</span><div class="swwrap"><input type="checkbox" id="eOn" hidden><button class="sw" id="eOnSw" onclick="swc('eOn')" aria-label="上架"></button></div></div>
+<div class="f"><span style="flex:1;width:auto;color:#c0392b">🧧 限定期間／預購專用</span><div class="swwrap"><input type="checkbox" id="eLim" hidden><button class="sw red" id="eLimSw" onclick="swc('eLim')" aria-label="限定"></button></div></div>
+<div id="eLimBox" style="display:none"><label class="f"><span>開始</span><input type="date" id="eFrom"></label><label class="f"><span>最後</span><input type="date" id="eTo"></label></div></div>
+<div class="tip" id="eLimTip" style="display:none;margin-top:-10px">客人只能選這段日子取餐（例如過年預購）；過了最後一天自動不顯示</div>
+<div id="eDelBox"><div class="gh">順序</div><div class="mvb"><button onclick="edMv(-1)">⬆ 往前移</button><button onclick="edMv(1)">⬇ 往後移</button></div>
+<button class="del" onclick="edDel()">🗑 刪除這個餐點</button></div>
+</div>
+<div class="ft"><button class="gr" id="edSave" onclick="edOk()">💾 儲存</button></div>
+</div></div>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上，和 index.html 相同）
 const SHOP='蓮緣素食',SIDE=['白飯','五穀飯','龜苓膏'],POLL=10000;
@@ -214,7 +260,8 @@ function tab(t){curTab=t;document.querySelectorAll('.tabs button').forEach(b=>b.
    h+=`<button class="day ${op?'op':'cl'}" onclick="flip('${k}')"><small>${d.getMonth()+1}月</small><b>${d.getDate()}</b><small>${op?'接預訂':'不接'}${lu==1?'・初一':lu==15?'・十五':''}</small>${bk?`<small>已訂 ${bk} 個</small>`:''}<span class="cap" onclick="event.stopPropagation();setCap('${k}')">${o.cap?'上限 '+o.cap:'上限：不限'}</span></button>`}
   B.innerHTML=h+'</div>'}
  if(t=='menu')menuTab();
- if(t=='sold'){B.innerHTML='<div class="tip">按一下切換。紅色＝<b>今天賣完</b>：客人不能選今天取餐，明天以後和預訂照常可訂；<b>明天會自動恢復</b>。</div>'+soldList().map((m,i)=>{const x=!!ST.soldOut[m[1]];return `<div class="it"><div class="nm">${esc(m[1])}</div><button class="so ${x?'x':''}" onclick="sold(${i},${!x})">${x?'⛔ 今天賣完':'✅ 有賣'}</button></div>`}).join('')}}
+ if(t=='sold'){B.innerHTML='<div class="tip">打開紅色開關＝<b>今天賣完</b>：客人不能選今天取餐，明天以後和預訂照常；<b>明天自動恢復</b>。</div><div class="grp">'+soldList().map((m,i)=>{const x=!!ST.soldOut[m[1]];return `<div class="row it"><div class="tx"><div class="nm">${esc(m[1])}</div><div class="sub">${x?'<span class="lt">⛔ 今天賣完</span>':'✅ 有賣'}</div></div><div class="swwrap"><button class="sw red so ${x?'on x':''}" onclick="sold(${i},${!x})" aria-label="賣完"></button></div></div>`}).join('')+'</div>'}
+ $('navR').style.visibility=t=='menu'?'visible':'hidden'}
 function flip(k){const [y,m,d]=k.split('-').map(Number),dt=new Date(y,m-1,d),o=ST.days[k]||{},op=o.off?false:o.on?true:baseOpen(dt),cap=+o.cap||0;
  let v=op?{off:true,cap}:(baseOpen(dt)?{cap}:{on:true,cap});if(!v.off&&!v.on&&!cap)v=null;save({days:{[k]:v}},op?`${m}/${d} 改成不接預訂`:`${m}/${d} 改成接預訂`)}
 async function setCap(k){const o=ST.days[k]||{},n=await ask({ic:'📅',t:`${k.slice(5).replace('-','/')} 最多接幾個預訂便當？`,m:'不限就填 0',num:o.cap||0,ok:'儲存',okc:'gr'});if(n===null)return;
@@ -225,14 +272,18 @@ function sold(i,x){const n=soldList()[i][1];save({soldOut:{[n]:x}},x?n+' 今天�
 const CATS=['人氣餐盒','套餐','單點'];let EI=-1,EPH='';
 function md(k){const [y,m,d]=String(k).split('-').map(Number);return m+'/'+d}
 function menuTab(){const L=ST.menu||[],B=$('setBody');
- B.innerHTML='<div class="tip">按 <b>✏ 編輯</b> 改品名、價錢、照片、分類；<b>▲▼</b> 換順序；按 <b>下架</b> 客人就看不到（之後可再上架）。<b>每改一次就自動儲存</b>。</div>'+
- `<div class="mbar"><button onclick="edOpen(-1)">➕ 新增餐點</button><button class="gy" onclick="allOn(false)">⏬ 全部下架</button><button class="gn" onclick="allOn(true)">⏫ 全部重新上架</button></div>`+
- (L.length?L.map((x,i)=>`<div class="mi ${x.on?'':'off'}">${x.photo?`<img src="${esc(x.photo)}" alt="">`:'<div class="noimg">沒有照片</div>'}
- <div class="tx"><div class="nm">${esc(x.name)}</div><div class="sub"><span class="tag ${x.on?'':'x'}">${x.on?'上架中':'已下架'}</span>${x.lim?`<span class="tag l">🧧 限定 ${md(x.from)}–${md(x.to)}</span>`:''}</div>
- <div class="sub">${esc(x.cat)}｜<b style="color:#c05800;font-size:28px">$${x.price}</b></div></div>
- <div class="ac"><button class="mv" onclick="mv(${i},-1)" ${i?'':'disabled'}>▲ 上移</button><button onclick="edOpen(${i})">✏ 編輯</button>
- <button class="mv" onclick="mv(${i},1)" ${i<L.length-1?'':'disabled'}>▼ 下移</button><button class="${x.on?'dn':'upn'}" onclick="onOff(${i})">${x.on?'下架':'上架'}</button></div></div>`).join(''):'<div class="empty">還沒有餐點，按「➕ 新增餐點」</div>')}
-function saveMenu(L,msg){toast('儲存中…');return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'menu',pin:PIN,items:L})}).then(r=>r.json())
+ B.innerHTML='<div class="tip">點一下餐點就能改品名、價錢、<b>拍照</b>。右邊開關＝上架／下架。<b>改完自動儲存</b>，客人網頁 2 分鐘內更新。</div>'+
+ '<div class="grp"><button class="row act" onclick="edOpen(-1)">＋ 新增餐點</button></div>'+
+ (L.length?catsNow().filter(c=>L.some(x=>x.cat==c)).map(c=>`<div class="gh">${esc(c)}</div><div class="grp">`+L.map((x,i)=>x.cat!=c?'':`<div class="row mrow ${x.on?'':'off'}">
+ <div class="th" onclick="edOpen(${i})">${x.photo?`<img class="th" src="${esc(x.photo)}" alt="">`:'📷'}</div>
+ <div class="tx" onclick="edOpen(${i})"><div class="nm">${esc(x.name)}</div><div class="sub"><b>$${x.price}</b>${x.on?'':'・已下架'}${x.lim?` ・<span class="lt">🧧 限定 ${md(x.from)}–${md(x.to)}</span>`:''}</div></div>
+ <div class="swwrap"><button class="sw ${x.on?'on':''}" onclick="onOff(${i})" aria-label="上架"></button></div><div class="chev" onclick="edOpen(${i})">›</div></div>`).join('')+'</div>').join(''):'<div class="tip">還沒有餐點，按「＋ 新增餐點」</div>')+
+ '<div class="gh">整份菜單</div><div class="grp"><button class="row act" onclick="allOn(true)">⏫ 全部重新上架</button><button class="row act red" onclick="allOn(false)">⏬ 全部下架（換新菜單用）</button></div>'}
+function swc(id){$(id).checked=!$(id).checked;swSync()}
+function swSync(){$('eOnSw').classList.toggle('on',$('eOn').checked);$('eLimSw').classList.toggle('on',$('eLim').checked);const l=$('eLim').checked;$('eLimBox').style.display=l?'block':'none';$('eLimTip').style.display=l?'block':'none'}
+function picShow(u){$('ePic').src=u||'';$('ePic').style.display=u?'block':'none';$('eNoPic').style.display=u?'none':'flex'}
+function edMv(d){const j=EI+d;if(EI<0||j<0||j>=ST.menu.length)return;edClose();mv(EI,d);toast(d<0?'往前移了 ⬆':'往後移了 ⬇')}
+function saveMenu(L,msg){toast('儲存中…');return postJ({action:'menu',pin:PIN,items:L})
  .then(r=>{if(!r.ok)throw r.error;ST=r;toast(msg||'已儲存 ✅ 客人網頁會更新');tab(curTab);return true}).catch(e=>{say(e=='pin'?'密碼不對，請重新登入':String(e));tab(curTab);return false})}
 function copyM(){return (ST.menu||[]).map(x=>({...x}))}
 function mv(i,d){const L=copyM(),j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];ST.menu=L;tab('menu');clearTimeout(mv.t);mv.t=setTimeout(()=>saveMenu(ST.menu,'順序已儲存 ✅'),900)}
@@ -244,10 +295,10 @@ async function allOn(on){if(!(await ask(on?{ic:'⏫',t:'全部重新上架？',m
 function catsNow(){const c=CATS.slice();(ST.menu||[]).forEach(x=>{if(x.cat&&!c.includes(x.cat))c.push(x.cat)});return c}
 function edOpen(i){EI=i;const x=i>=0?ST.menu[i]:{name:'',price:150,cat:'人氣餐盒',desc:'',photo:'',on:true,lim:false,from:'',to:''};EPH=x.photo||'';
  $('edT').textContent=i>=0?'✏ 編輯餐點':'➕ 新增餐點';$('eName').value=x.name;$('ePrice').value=x.price;$('eDesc').value=x.desc||'';
- $('eCat').innerHTML=catsNow().map(c=>`<option ${c==x.cat?'selected':''}>${esc(c)}</option>`).join('')+'<option value="+">＋ 新分類…</option>';$('eCatNew').style.display='none';$('eCatNew').value='';
- $('eLim').checked=!!x.lim;$('eLimBox').style.display=x.lim?'block':'none';$('eFrom').value=x.from||'';$('eTo').value=x.to||'';$('eOn').checked=!!x.on;
- $('ePic').src=EPH||'';$('ePicSt').textContent=EPH?'':'還沒有照片';$('eDelBox').style.display=i>=0?'flex':'none';$('ed').style.display='flex';$('ed').querySelector('.bx').scrollTop=0}
-function edClose(){$('ed').style.display='none'}
+ $('eCat').innerHTML=catsNow().map(c=>`<option ${c==x.cat?'selected':''}>${esc(c)}</option>`).join('')+'<option value="+">＋ 新分類…</option>';$('eCatNewRow').style.display='none';$('eCatNew').value='';
+ $('eLim').checked=!!x.lim;$('eFrom').value=x.from||'';$('eTo').value=x.to||'';$('eOn').checked=!!x.on;swSync();
+ picShow(EPH);$('ePicSt').textContent='';$('ePicSt').className='';$('eDelBox').style.display=i>=0?'block':'none';$('ed').style.display='flex';$('ed').querySelector('.sc').scrollTop=0;document.body.style.overflow='hidden'}
+function edClose(){$('ed').style.display='none';document.body.style.overflow=''}
 function ePrice(d){$('ePrice').value=Math.max(10,(parseInt($('ePrice').value,10)||0)+d)}
 async function edOk(){const name=$('eName').value.trim(),price=parseInt(String($('ePrice').value).replace(/\D/g,''),10),cat=$('eCat').value=='+'?$('eCatNew').value.trim():$('eCat').value;
  const lim=$('eLim').checked,from=$('eFrom').value,to=$('eTo').value;
@@ -258,12 +309,21 @@ async function edOk(){const name=$('eName').value.trim(),price=parseInt(String($
  if(EI>=0)L[EI]=it;else L.unshift(it);if(await saveMenu(L,(EI>=0?'已修改 ':'已新增 ')+name+' ✅'))edClose()}
 async function edDel(){const x=ST.menu[EI];if(!(await ask({ic:'🗑',t:`刪除「${x.name}」？`,m:'刪掉就不見了。\n只是暫時不賣的話，請用「下架」',ok:'確定刪除',okc:'rd'})))return;
  const L=copyM();L.splice(EI,1);if(await saveMenu(L,'已刪除 '+x.name))edClose()}
-function pickPic(){$('pic').value='';$('pic').click()}
-function shrink(file,max=800,qual=0.75){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const r=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',qual))};im.onerror=()=>rej('讀不到照片');im.src=u})}
-async function gotPic(inp){const f=inp.files&&inp.files[0];if(!f)return;try{$('ePicSt').textContent='照片縮小中…';const data=await shrink(f);$('ePic').src=data;
- $('ePicSt').textContent=`上傳中，請稍等…（${Math.round(data.length*0.75/1024)} KB）`;
- const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'photo',pin:PIN,name:$('eName').value.trim()||'新餐點',data,forMenu:1})}).then(r=>r.json());
- if(!r.ok)throw r.error;EPH=r.url;$('ePicSt').textContent='✅ 照片上傳好了，按「完成」儲存'}catch(e){$('ePic').src=EPH||'';$('ePicSt').textContent='';say('照片沒有上傳成功，請再試一次：'+e)}}
+function pickPic(cam){const f=$(cam?'pic':'pic2');f.value='';f.click()}
+// 讀照片：先用 createImageBitmap（會自動轉正 iPhone 直拍照片），不行再用 <img>
+function loadImg(file){return (window.createImageBitmap?createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>createImageBitmap(file)):Promise.reject()).catch(()=>new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{res(im);setTimeout(()=>URL.revokeObjectURL(u),1000)};im.onerror=()=>rej('這張照片讀不到（請改用「📷 拍照」或換一張）');im.src=u}))}
+async function shrink(file,max=800,qual=0.75){const im=await loadImg(file),w=im.width,h=im.height;if(!w||!h)throw '照片大小讀不到';
+ const r=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*r));c.height=Math.max(1,Math.round(h*r));
+ const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);if(im.close)im.close();
+ const d=c.toDataURL('image/jpeg',qual);if(!/^data:image\/jpeg;base64,/.test(d)||d.length<200)throw '照片轉檔失敗';return d}
+// 後台回傳不是 JSON（例如 Google 權限錯誤頁）時，也要看得懂
+async function postJ(body){const t=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(r=>r.text());
+ try{return JSON.parse(t)}catch(e){throw /permission|權限|authoriz|授權/i.test(t)?'後台沒有 Google 雲端硬碟權限（老闆要在 Apps Script 執行一次 authDrive）':'後台回傳錯誤：'+t.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,120)}}
+async function gotPic(inp){const f=inp.files&&inp.files[0];if(!f)return;const st=$('ePicSt');st.className='';try{st.textContent='照片縮小中…';const data=await shrink(f);picShow(data);
+ st.textContent=`上傳中，請稍等…（${Math.round(data.length*0.75/1024)} KB）`;$('edSave').disabled=true;
+ const r=await postJ({action:'photo',pin:PIN,name:$('eName').value.trim()||'新餐點',data,forMenu:1});
+ if(!r.ok)throw r.error=='pin'?'密碼不對，請重新登入':r.error=='image'?'照片格式不對':String(r.error);EPH=r.url;st.textContent='✅ 照片上傳好了，按「儲存」'}
+ catch(e){picShow(EPH);st.className='bad';st.textContent='❌ '+e;say('照片沒有上傳成功：\n'+e)}finally{$('edSave').disabled=false}}
 $('size').value=localStorage.ly_size||'40';setSize();$('mode').value=localStorage.ly_mode||'rawbt';$('skip').checked=!!localStorage.ly_skip;
 if(!GAS_URL){$('conn').textContent='⚠ 尚未設定後端網址'}
 if(PIN){$('pin').style.display='none';start()}else $('pin').style.display='flex';
