@@ -70,6 +70,8 @@ pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font
 .ctot{text-align:right;font-size:21px;font-weight:700;margin:10px 0 4px}
 .btn.more{background:#fff;color:var(--g);border:2px solid var(--g);font-size:19px}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
+.seg{display:flex;gap:8px;margin:6px 0 4px}.seg button{flex:1;font-size:18px;font-weight:700;padding:14px 4px;border:2px solid var(--g);border-radius:14px;background:#fff;color:var(--g)}.seg button.on{background:var(--g);color:#fff}.seg button:disabled{opacity:.4}
+.mdl .rd{background:#c0392b;color:#fff}.mdl .gy{background:#e5e5e5;color:#333}.mdl .ln{background:#06c755;color:#fff}.mdl .sm{font-size:15px;color:#777}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
 <nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
@@ -103,7 +105,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <label>姓名</label><input id="nm" name="name" autocomplete="name">
 <label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
-<div id="preBox" style="display:none"><div class="info" id="preRule" style="background:#fff3e6;font-size:14px;line-height:1.6"></div>
+<div id="modeBox"><label>什麼時候取？</label><div class="seg"><button id="mToday" onclick="setPM(false)">🏃 今天現場取</button><button id="mPre" onclick="setPM(true)">📅 預訂別天</button></div></div><div id="preBox" style="display:none"><div class="info" id="preRule" style="background:#fff3e6;font-size:14px;line-height:1.6"></div>
 <label>預訂日期</label><select id="pd" onchange="preTimes()" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select></div>
 <label>取餐時間</label><select id="tm" style="width:100%;font-size:20px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="offHint" style="display:none;color:#c0392b;font-weight:700">店裡暫停接今日訂單，請選明天以後取餐 🙏</p><p class="note" id="limHint" style="display:none;color:#c0392b;font-weight:700;font-size:16px">🧧 有限定期間的餐點，只能選限定的日子取餐</p><p class="note" id="tmHint">上午 10:30–下午 1:50、下午 4:30–7:50，每 10 分鐘一個時段，下單後最快 10 分鐘可取；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
@@ -113,6 +115,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <button class="btn copy" onclick="copyOrder()">📋 複製訂單文字</button>
 <a class="btn tel" href="tel:0227038823">📞 打電話訂餐 02-2703-8823</a>
 <pre id="preview"></pre></div></div>
+<div class="mdl" id="okMdl"><div class="bx" id="okBx"></div></div><div class="mdl" id="cMdl"><div class="bx" id="cBx"></div></div>
 <script src="menu.js"></script>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上）
@@ -169,7 +172,7 @@ function cartSet(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=M
  if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;const e=document.getElementById('q'+i);if(e)e.value=n;upd();
  if(!cnt()&&fin){closeSheet();return}
  const tm=document.getElementById('tm').value,pd=document.getElementById('pd')&&document.getElementById('pd').value;setMode();
- if(pd&&[...document.getElementById('pd').options].some(o=>o.value==pd&&!o.disabled)){document.getElementById('pd').value=pd;if(cnt()>=PRE_MIN)preTimes()}
+ if(pd&&[...document.getElementById('pd').options].some(o=>o.value==pd&&!o.disabled)){document.getElementById('pd').value=pd;if(isPre())preTimes()}
  if([...document.getElementById('tm').options].some(o=>o.value==tm))document.getElementById('tm').value=tm;
  if(fin&&!n){cartRender();return}
  if(fin)cartRender();else{const ci=document.getElementById('cq'+i);if(ci&&ci.value!==d)ci.value=d;const cs=document.getElementById('cs'+i);if(cs)cs.textContent='$'+M[i][2]*n;
@@ -181,8 +184,8 @@ function cartSet(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=M
  document.addEventListener('touchend',()=>{if(y0===null)return;y0=null;if(dy>80)closeSheet();else inn().style.transform=''})})();
 function txt(){const w='現場取餐',v=id=>document.getElementById(id).value.trim();
 if(!window.OID)window.OID=String(Date.now()).slice(-6)+Math.floor(Math.random()*10); // 客人端 token
-const n=cnt(),pre=n>=PRE_MIN;
-return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ '+(window.DEP===true?'第一次訂大單：需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家確認後才成立':window.DEP===false?'老客人免訂金 🙏':'第一次訂大單需付 30% 訂金，訂過的老客人免訂金（店家會確認）')+'；有付訂金的，取餐前兩天以前取消才退':''}`}
+const n=cnt(),pre=isPre();
+return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ '+(window.DEP===true?'第一次訂大單：需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家確認後才成立':window.DEP===false?'老客人免訂金 🙏':'第一次訂大單需付 30% 訂金，訂過的老客人免訂金（店家會確認）')+'；有付訂金的，取餐前兩天以前取消才退':''}${window.SID&&window.CT?'\n要取消請點👉 '+cancelUrl(window.SID,window.CT):''}`}
 function fmt(d){const h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return (h<12?'上午 ':'下午 ')+(h>12?h-12:h)+':'+m}
 // 取餐時段：上午 10:30–13:50、下午 16:30–19:50，每 10 分鐘；至少提前 LEAD 分鐘
 var LEAD=10;
@@ -206,34 +209,61 @@ function baseOpen(d){return d.getDay()!=0||[1,15].includes(lunarDay(d))} // 週�
 function dayOpen(d){const o=S.days[ymd(d)]||{};return o.off?false:o.on?true:baseOpen(d)}
 function preDates(n){const now=new Date(),out=[];
  for(let i=1;i<=PRE_DAYS;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i),k=ymd(d);
-  if(i<lead(n)||(i==lead(n)&&now.getHours()>=CUTOFF)||!dayOpen(d)||!dayAllowed(d))continue;
+  if(i<lead(n)||(i==lead(n)&&n>=PRE_MIN&&now.getHours()>=CUTOFF)||!dayOpen(d)||!dayAllowed(d))continue;
   const cap=+(S.days[k]||{}).cap||0,left=cap?cap-(+S.booked[k]||0):null;out.push({d,k,left,full:left!==null&&left<n})}return out}
-function setMode(){const n=cnt(),pre=n>=PRE_MIN,box=document.getElementById('preBox');box.style.display=pre?'block':'none';document.getElementById('tmHint').style.display=pre?'none':'block';
+function setMode(){const n=cnt(),pre=isPre(),box=document.getElementById('preBox');box.style.display=pre?'block':'none';document.getElementById('tmHint').style.display=pre?'none':'block';document.getElementById('modeBox').style.display=n>=PRE_MIN?'none':'block';document.getElementById('mToday').className=pre?'':'on';document.getElementById('mPre').className=pre?'on':'';
  if(!pre){buildSlots();return}
  const L=preDates(n),pd=document.getElementById('pd'),old=pd.value;
  pd.innerHTML=L.map(x=>`<option value="${x.k}" ${x.full?'disabled':''}>${x.d.getMonth()+1}/${x.d.getDate()}（${WK[x.d.getDay()]}）${[1,15].includes(lunarDay(x.d))?(lunarDay(x.d)==1?' 初一':' 十五'):''}${x.full?` 只剩 ${Math.max(0,x.left)} 個（不夠）`:x.left!==null?` 還可訂 ${x.left} 個`:''}</option>`).join('');
  if(L.some(x=>x.k==old&&!x.full))pd.value=old;else{const f=L.find(x=>!x.full);pd.value=f?f.k:''}
- const k=lead(n);document.getElementById('preRule').innerHTML=`📅 <b>${n} 個 = 預訂單</b>：要在取餐日的<b>前一天 下午 3 點前</b>訂，最多可訂 30 天內。`+
+ const k=lead(n);document.getElementById('preRule').innerHTML=n<PRE_MIN?'📅 <b>預訂別天</b>：明天以後、最多 30 天內都可以選（週日休息），時段跟平常一樣。<br>↩ 送出後如果訂錯，可以按「取消這張訂單」。':`📅 <b>${n} 個 = 預訂單</b>：要在取餐日的<b>前一天 下午 3 點前</b>訂，最多可訂 30 天內。`+
   (n>=30?'<br>💰 <b>第一次訂大單需付 30% 訂金</b>（約 $'+Math.round(tot()*0.3)+'），<b>訂過的老客人免訂金</b>。送出後會告訴你要不要付。':'')+'<br>↩ 取餐<b>前兩天</b>以前取消，訂金全額退還；<b>前一天才取消不退</b>（菜已經買好了）。';
  preTimes()}
 function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
  addDay(sel,day,`${m}/${dd}（${WK[day.getDay()]}）`,null)}
 ['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});
-function tmOk(){if(!document.getElementById('tm').value){alert(cnt()>=PRE_MIN?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
+function tmOk(){if(!document.getElementById('tm').value){alert(isPre()?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
 function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){alert('請填姓名和電話');return false}return true}
 function copyOrder(){if(!ok())return;const t=txt();document.getElementById('preview').textContent=t;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert('已複製訂單，可貼到 LINE 傳給店家')).catch(()=>alert('請長按下方文字複製'))}
 function lineUrl(t){return 'https://line.me/R/oaMessage/@522ociyo/?'+encodeURIComponent(t)}
 // 送單給後端，取回店家編號（MMDD-NNN）；失敗或逾時就用 token 當編號，點餐不中斷
 async function sendGas(){if(!GAS_URL)return;txt();const v=id=>document.getElementById(id).value.trim();
- const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),date:cnt()>=PRE_MIN?v('pd'):'',total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
+ const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),pre:isPre()?1:0,date:isPre()?v('pd'):'',total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
  const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),6000);
  try{const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),signal:ac&&ac.signal});
-  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id)){window.SID=d.id;if(d.pre)window.DEP=!!d.deposit}else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
+  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id)){window.SID=d.id;window.CT=d.ct||'';if(d.ct)try{localStorage.ly_last=JSON.stringify({id:d.id,t:d.ct})}catch(e){}if(d.pre)window.DEP=!!d.deposit}else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
 let sending=false;
 async function lineShare(){if(sending||!ok())return false;const b=document.getElementById('lineBtn'),old=b.textContent;
  sending=true;b.textContent='⏳ 傳送中…';b.style.opacity=.6;
  window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity=''}
  if(window.PREERR){alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',paused:'店裡現在暫停接今日訂單，請改選明天以後取餐 🙏',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
  if(cnt()>=PRE_MIN&&window.DEP!==undefined)alert(window.DEP?'💰 這是你第一次訂大單，需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家會跟你聯絡。\n取餐前兩天以前取消，訂金全額退還；前一天才取消不退。':'🙏 你是老客人，這次大單免訂金！\n如要取消，請提早告訴店家。');
+ if(window.CT){showOk();return false}
  location.href=lineUrl(txt());return false}
+
+// ===== 小單也能「預訂別天」=====
+let PM=false;function isPre(){return cnt()>=PRE_MIN||PM}
+function setPM(v){PM=v;setMode()}
+// ===== 送出成功畫面＋客人自己取消 =====
+function cancelUrl(id,t){return location.origin+location.pathname+'?cancel='+encodeURIComponent(id)+'&t='+encodeURIComponent(t)}
+async function gpost(o){const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json()}
+function mdl(id,html){const m=document.getElementById(id);document.getElementById(id=='okMdl'?'okBx':'cBx').innerHTML=html;m.style.display=html?'flex':'none'}
+function showOk(){mdl('okMdl',`<div style="font-size:48px">✅</div><h3 style="color:#2e7d32">訂單已送出！<br>編號 ${esc(window.SID)}</h3>
+ <p>最後一步：按下面綠色按鈕，在 LINE 按「傳送」，店家回覆『收到』才算成功。</p>
+ <a class="bb ln" id="goLine" href="${esc(lineUrl(txt()))}">💬 開啟 LINE 傳送訂單</a>
+ <button class="bb gy" onclick="cancelFlow(window.SID,window.CT)">取消這張訂單</button><p class="sm">訂錯了？店家接單前按取消會馬上取消；接單後會送出取消申請給店家。</p>`)}
+const CMSG={pending:'店家還沒接單，取消後馬上生效。',accepted:'店家已經接單了，按取消會送「取消申請」給店家，店家同意才算取消。'};
+let CID='',CTK='';async function cancelFlow(id,t){CID=id;CTK=t;mdl('okMdl','');mdl('cMdl','<p>讀取中…</p>');let d;try{d=await gpost({action:'cstatus',id,t})}catch(e){d={}}
+ if(!d.ok){mdl('cMdl',`<div style="font-size:44px">😥</div><h3>找不到這張訂單</h3><p>請打 <b>02-2703-8823</b> 或傳 LINE</p><button class="bb ok" onclick="mdl('cMdl','')">好</button>`);return}
+ if(d.state!='pending'&&d.state!='accepted'){cRes(d.state,id,t);return}
+ mdl('cMdl',`<div style="font-size:48px">🗑️</div><h3>確定要取消這張訂單嗎？</h3><p><b>編號 ${esc(id)}</b><br>${esc(d.items).replace(/\n/g,'、')}<br>取餐：${esc(d.pickup)}</p><p class="sm">${CMSG[d.state]}<br>有付訂金的：取餐前兩天以前取消才退訂金。</p>
+ <button class="bb rd" id="cYes" onclick="doCancel(CID,CTK)">${d.state=='accepted'?'送出取消申請':'確定取消'}</button><button class="bb gy" onclick="mdl('cMdl','')">不要取消</button>`)}
+async function doCancel(id,t){const b=document.getElementById('cYes');b.disabled=true;b.textContent='⏳ 處理中…';let r;try{r=await gpost({action:'cancel',id,t})}catch(e){r={}}
+ cRes(r.ok?(r.request?'request':'cancelled'):r.error=='denied'?'denied':r.error=='accepted'?'denied':'err',id,t)}
+let cPoll=null;
+function cRes(st,id,t){clearTimeout(cPoll);const C={cancelled:['✅','已取消','這張訂單已經取消了，謝謝告知 🙏'],request:['📨','已送出取消申請','店家已經接單，正在等店家回覆…<br>這個畫面會自動更新，也會用 LINE 通知你。'],
+ denied:['🍳','店家已開始製作，無法取消','有問題請打 <a href="tel:0227038823"><b>02-2703-8823</b></a> 或傳 LINE'],soldout:['😢','這張單已經沒有成立','今天餐點已售完'],err:['😥','取消沒有成功','請打 <a href="tel:0227038823"><b>02-2703-8823</b></a> 或傳 LINE']}[st]||['','','']
+ mdl('cMdl',`<div style="font-size:48px">${C[0]}</div><h3 style="color:${st=='cancelled'?'#2e7d32':'#c0392b'}">${C[1]}</h3><p>${C[2]}</p><button class="bb ok" onclick="clearTimeout(cPoll);mdl('cMdl','')">好</button>`);
+ if(st=='request')cPoll=setTimeout(async()=>{let d={};try{d=await gpost({action:'cstatus',id,t})}catch(e){}cRes(d.ok?d.state:'request',id,t)},10000)}
+{const u=new URLSearchParams(location.search);if(u.get('cancel')&&u.get('t'))setTimeout(()=>{const m=document.getElementById('pauseMdl');if(m)m.style.display='none';cancelFlow(u.get('cancel'),u.get('t'))},300)}
 </script></body></html>
