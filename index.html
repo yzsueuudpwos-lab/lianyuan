@@ -50,6 +50,7 @@ pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font
 .mdl h3{font-size:24px;line-height:1.5;color:#c0392b;margin:6px 0 12px}.mdl p{font-size:20px;line-height:1.6;margin:12px 0 0;color:var(--t)}
 .mdl .bb{display:block;width:100%;border:0;border-radius:14px;padding:16px;font-size:22px;font-weight:700;margin-top:12px;text-decoration:none;box-sizing:border-box}
 .mdl .tl{background:var(--o);color:#fff}.mdl .ok{background:var(--g);color:#fff}
+.qty input.qin{width:64px;height:44px;font-size:22px;font-weight:700;text-align:center;padding:2px;border:2px solid var(--g);border-radius:10px;background:#fff;color:var(--t)}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
@@ -104,7 +105,7 @@ function banner(){const b=document.getElementById('pauseBan');if(!b)return;b.sty
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function imgOf(m){const u=S.photo[m[1]];return /^https:\/\/lh3\.googleusercontent\.com\//.test(u||'')?u:(m[4]?m[4]+'.jpg':'')}
 function render(){[1,2,3].forEach(c=>document.getElementById('l'+c).innerHTML='');
-M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m);document.getElementById('l'+m[0]).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3><p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><span id="q${i}">${q[i]}</span><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
+M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m);document.getElementById('l'+m[0]).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3><p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
 render();
 // 讀店家設定（價錢、照片、今天賣完、預訂日曆）；讀不到就用 menu.js 的預設值
 function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
@@ -113,7 +114,9 @@ function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.f
 function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];m[2]=p>0?p:MENU[i][2];});render();upd();banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{})}
 banner();setInterval(()=>loadS(),120000);
 loadS();
-function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.max(0,q[i]+d);document.getElementById('q'+i).textContent=q[i];upd()}
+function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.min(999,Math.max(0,q[i]+d));document.getElementById('q'+i).value=q[i];upd()}
+// 直接打數字：只留 0–999 的整數，空白算 0；打字中不硬改空白，離開時才補 0
+function setQ(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=Math.min(999,parseInt(d||'0',10));const e=document.getElementById('q'+i);if(fin||e.value!==d)e.value=(!fin&&d==='')?'':String(n);if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;upd()}
 function tot(){return M.reduce((s,m,i)=>s+m[2]*q[i],0)}
 function cnt(){return q.reduce((a,b)=>a+b,0)}
 function upd(){const n=q.reduce((a,b)=>a+b,0);document.getElementById('sum').textContent=n?`共 ${n} 份｜$${tot()}`:'尚未選餐'}
