@@ -13,7 +13,7 @@
 
 <style>
 :root{--g:#3f7d3a;--g2:#eaf3e6;--t:#2b2b2b;--o:#c8702a}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;color:var(--t);background:#fbfaf6;padding-bottom:90px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;color:var(--t);background:#fbfaf6;padding-bottom:130px}
 header{position:sticky;top:0;z-index:5;background:#fff;box-shadow:0 1px 6px #0001}
 .top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
 .top b{font-size:19px;color:var(--g)}.top a{color:var(--g);text-decoration:none;font-size:14px}
@@ -53,6 +53,22 @@ pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font
 .mdl .tl{background:var(--o);color:#fff}.mdl .ok{background:var(--g);color:#fff}
 .qty input.qin{width:64px;height:44px;font-size:22px;font-weight:700;text-align:center;padding:2px;border:2px solid var(--g);border-radius:10px;background:#fff;color:var(--t)}
 .lim{display:inline-block;background:#fdecea;color:#c0392b;border-radius:10px;padding:3px 10px;font-size:15px;font-weight:700;margin-top:4px}
+ /* 購物車圓鈕＋結帳面板 */
+#bar{padding-right:100px}
+#fab{display:none;position:fixed;right:14px;bottom:calc(30px + env(safe-area-inset-bottom));width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:var(--g);color:#fff;font-size:34px;z-index:10;box-shadow:0 4px 14px #0005;align-items:center;justify-content:center;padding:0}
+#fab.show{display:flex}#fab b{position:absolute;top:-6px;right:-6px;min-width:30px;height:30px;padding:0 7px;border-radius:15px;background:#e53935;color:#fff;font-size:18px;line-height:30px;border:2px solid #fff}
+#fab.bump{animation:bump .45s}@keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(.92)}100%{transform:scale(1)}}
+#sheet .in{padding-top:0;transition:transform .2s}
+#sheet .hd{position:sticky;top:0;z-index:2;background:#fff;margin:0 -16px;padding:6px 12px 10px;border-bottom:1px solid #eee;touch-action:none}
+#sheet .grab{width:54px;height:6px;border-radius:3px;background:#ccc;margin:2px auto 8px}
+#sheet .hr{display:flex;align-items:center;gap:8px}#sheet .hr h2{flex:1;text-align:center;margin:0;font-size:22px;border:0;padding:0}
+#sheet .back{border:0;background:var(--g2);color:var(--g);font-size:19px;font-weight:700;border-radius:24px;padding:12px 16px;white-space:nowrap}
+#sheet .x{border:0;background:#eee;color:#333;width:48px;height:48px;border-radius:50%;font-size:26px;flex:none}
+.ci2{display:flex;align-items:center;gap:6px;padding:12px 0;border-bottom:1px solid #eee;flex-wrap:wrap}
+.ci2 .n{flex:1 1 100%;font-size:19px;font-weight:700}.ci2 .st{margin-left:auto;font-size:19px;font-weight:700;color:var(--g)}
+.ci2 .qty button{width:44px;height:44px}.ci2 .del{border:0;background:#fdecea;border-radius:12px;width:48px;height:44px;font-size:22px}
+.ctot{text-align:right;font-size:21px;font-weight:700;margin:10px 0 4px}
+.btn.more{background:#fff;color:var(--g);border:2px solid var(--g);font-size:19px}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
@@ -64,7 +80,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <div class="steps"><div><b>1</b>選餐點</div><div><b>2</b>填姓名電話</div><div><b>3</b>送出訂單</div><div><b>4</b>店家回覆「收到」</div></div>
 <p class="note" style="margin-top:10px;color:#c8702a;font-weight:700">⏰ 中午最多人訂，請提早預訂！晚上 19:30 後不接便當訂單</p>
 <p class="note">🏪 目前只提供現場取餐</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
-<p class="note">📅 <b>10 個以上請預訂</b>：前一天下午 3 點前訂；30 個以上前兩天、50 個以上前三天；最多可訂 30 天內。30 個以上需付 30% 訂金或電話確認，前一天以前取消全額退款。</p></section>
+<p class="note">📅 <b>30 個以上請預訂</b>：取餐<b>前一天</b>下午 3 點前訂，最多可訂 30 天內；30 個以下當天現做也可以。<b>第一次訂大單需付 30% 訂金，訂過的老客人免訂金</b>（送出後會告訴你要不要付）。<b>取餐前兩天</b>以前取消才退訂金；前一天才取消不退（菜已經買好了）。</p></section>
 
 <div id="menuSecs"></div>
 
@@ -79,8 +95,11 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 
 <div class="mdl" id="pauseMdl"><div class="bx"><div style="font-size:44px">🙏</div><h3>目前店員未上線<br>今天的餐點無法線上訂購</h3><p>請直接打電話：<b>02-2703-8823</b></p><a class="bb tl" href="tel:0227038823">📞 打電話</a><p>要預訂其他日期，可以繼續點餐</p><button class="bb ok" onclick="document.getElementById('pauseMdl').style.display='none'">繼續預訂其他日期</button></div></div>
 <div id="bar"><span id="sum">尚未選餐</span><button onclick="openSheet()">去結帳</button></div>
-<div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div class="in">
-<h2>確認訂單</h2><pre id="items"></pre>
+<button id="fab" onclick="openSheet()" aria-label="購物車，去結帳">🛒<b id="fabN">0</b></button>
+<div id="sheet" onclick="if(event.target==this)closeSheet()"><div class="in">
+<div class="hd" id="sheetHd"><div class="grab"></div><div class="hr"><button class="back" onclick="closeSheet()">← 繼續選購</button><h2>確認訂單</h2><button class="x" onclick="closeSheet()" aria-label="關閉">×</button></div></div>
+<div id="cart"></div><pre id="items" style="display:none"></pre>
+<button class="btn more" onclick="closeSheet()">＋ 繼續選購（回菜單）</button>
 <label>姓名</label><input id="nm" name="name" autocomplete="name">
 <label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
@@ -130,13 +149,40 @@ function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.min(999,Math.max(0,q
 function setQ(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=Math.min(999,parseInt(d||'0',10));const e=document.getElementById('q'+i);if(fin||e.value!==d)e.value=(!fin&&d==='')?'':String(n);if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;upd()}
 function tot(){return M.reduce((s,m,i)=>s+m[2]*q[i],0)}
 function cnt(){return q.reduce((a,b)=>a+b,0)}
-function upd(){const n=q.reduce((a,b)=>a+b,0);document.getElementById('sum').textContent=n?`共 ${n} 份｜$${tot()}`:'尚未選餐'}
+let lastN=0;
+function upd(){const n=q.reduce((a,b)=>a+b,0);document.getElementById('sum').textContent=n?`共 ${n} 份｜$${tot()}`:'尚未選餐';
+ const f=document.getElementById('fab');if(f){f.classList.toggle('show',n>0);document.getElementById('fabN').textContent=n>99?'99+':n;
+  if(n>lastN){f.classList.remove('bump');void f.offsetWidth;f.classList.add('bump')}}lastN=n}
 function lines(){return M.map((m,i)=>q[i]?`${m[1]} x${q[i]} = $${m[2]*q[i]}`:null).filter(Boolean)}
-function openSheet(){if(!tot()){alert('請先選餐點');return}setMode();document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`;document.getElementById('sheet').style.display='block'}
+function sheetOpen(){return document.getElementById('sheet').style.display==='block'}
+function openSheet(){if(!tot()){alert('請先選餐點');return}setMode();cartRender();const sh=document.getElementById('sheet');
+ if(!sheetOpen()){sh.style.display='block';sh.querySelector('.in').scrollTop=0;if(!(history.state&&history.state.cart))history.pushState({cart:1},'')}}
+// 關掉結帳面板（按鈕／點外面／往下滑／手機返回手勢都走這裡）
+function closeSheet(fromPop){const sh=document.getElementById('sheet');sh.style.display='none';sh.querySelector('.in').style.transform='';
+ if(!fromPop&&history.state&&history.state.cart)history.back()}
+addEventListener('popstate',()=>{if(sheetOpen())closeSheet(true)});
+function cartRender(){const c=document.getElementById('cart');
+ c.innerHTML=M.map((m,i)=>q[i]?`<div class="ci2" id="ci${i}"><div class="n">${esc(m[1])}　<span style="font-weight:400;color:#777">$${m[2]}</span></div><button class="del" onclick="cartSet(${i},0,true)" aria-label="刪除 ${esc(m[1])}">🗑</button><div class="qty"><button class="m" onclick="cartSet(${i},q[${i}]-1,true)">−</button><input class="qin" id="cq${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="cartSet(${i},this.value,false)" onchange="cartSet(${i},this.value,true)" onblur="cartSet(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="cartSet(${i},q[${i}]+1,true)">＋</button></div><span class="st" id="cs${i}">$${m[2]*q[i]}</span></div>`:'').join('')+`<div class="ctot" id="ctot">合計 $${tot()}（共 ${cnt()} 份）</div>`;
+ document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}
+// 結帳裡改數量：和菜單一樣的清理規則（0–999 整數），同步菜單卡片；打字中不重畫，離開才整理
+function cartSet(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=Math.min(999,Math.max(0,parseInt(d||'0',10)));
+ if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;const e=document.getElementById('q'+i);if(e)e.value=n;upd();
+ if(!cnt()&&fin){closeSheet();return}
+ const tm=document.getElementById('tm').value,pd=document.getElementById('pd')&&document.getElementById('pd').value;setMode();
+ if(pd&&[...document.getElementById('pd').options].some(o=>o.value==pd&&!o.disabled)){document.getElementById('pd').value=pd;if(cnt()>=PRE_MIN)preTimes()}
+ if([...document.getElementById('tm').options].some(o=>o.value==tm))document.getElementById('tm').value=tm;
+ if(fin&&!n){cartRender();return}
+ if(fin)cartRender();else{const ci=document.getElementById('cq'+i);if(ci&&ci.value!==d)ci.value=d;const cs=document.getElementById('cs'+i);if(cs)cs.textContent='$'+M[i][2]*n;
+  document.getElementById('ctot').textContent=`合計 $${tot()}（共 ${cnt()} 份）`;document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}}
+// 往下滑標題列關閉
+(function(){let y0=null,dy=0;const hd=()=>document.getElementById('sheetHd'),inn=()=>document.querySelector('#sheet .in');
+ document.addEventListener('touchstart',e=>{if(hd()&&hd().contains(e.target)&&!e.target.closest('button')){y0=e.touches[0].clientY;dy=0}},{passive:true});
+ document.addEventListener('touchmove',e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);inn().style.transform=`translateY(${dy}px)`},{passive:true});
+ document.addEventListener('touchend',()=>{if(y0===null)return;y0=null;if(dy>80)closeSheet();else inn().style.transform=''})})();
 function txt(){const w='現場取餐',v=id=>document.getElementById(id).value.trim();
 if(!window.OID)window.OID=String(Date.now()).slice(-6)+Math.floor(Math.random()*10); // 客人端 token
 const n=cnt(),pre=n>=PRE_MIN;
-return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ 30 個以上：付 30% 訂金或店家電話確認後才成立':''}`}
+return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ '+(window.DEP===true?'第一次訂大單：需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家確認後才成立':window.DEP===false?'老客人免訂金 🙏':'第一次訂大單需付 30% 訂金，訂過的老客人免訂金（店家會確認）')+'；有付訂金的，取餐前兩天以前取消才退':''}`}
 function fmt(d){const h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return (h<12?'上午 ':'下午 ')+(h>12?h-12:h)+':'+m}
 // 取餐時段：上午 10:30–13:50、下午 16:30–19:50，每 10 分鐘；至少提前 LEAD 分鐘
 var LEAD=10;
@@ -150,12 +196,12 @@ function buildSlots(){const sel=document.getElementById('tm');sel.innerHTML='';c
 const lim=hasLim();document.getElementById('limHint').style.display=lim?'block':'none';for(let i=0;i<(lim?400:7)&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0||(i==0&&(soT||off))||!dayAllowed(day))continue;const label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
 if(addDay(sel,day,label,earliest))n++}}
 buildSlots();
-// ===== 預訂（10 個以上）=====
-const PRE_MIN=10,PRE_DAYS=30,CUTOFF=15,SLOTS=[[630,810],[990,1170]],WK='日一二三四五六';
+// ===== 預訂（30 個以上，前一天訂）=====
+const PRE_MIN=30,PRE_DAYS=30,CUTOFF=15,SLOTS=[[630,810],[990,1170]],WK='日一二三四五六';
 const LF=(()=>{try{return new Intl.DateTimeFormat('zh-TW-u-ca-chinese',{day:'numeric'})}catch(e){return null}})();
 function lunarDay(d){try{const p=LF&&LF.formatToParts(d).find(x=>x.type=='day');return p?parseInt(p.value,10):0}catch(e){return 0}}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function lead(n){return n>=50?3:n>=30?2:1}
+function lead(n){return 1}
 function baseOpen(d){return d.getDay()!=0||[1,15].includes(lunarDay(d))} // 週日休，初一十五照開
 function dayOpen(d){const o=S.days[ymd(d)]||{};return o.off?false:o.on?true:baseOpen(d)}
 function preDates(n){const now=new Date(),out=[];
@@ -167,8 +213,8 @@ function setMode(){const n=cnt(),pre=n>=PRE_MIN,box=document.getElementById('pre
  const L=preDates(n),pd=document.getElementById('pd'),old=pd.value;
  pd.innerHTML=L.map(x=>`<option value="${x.k}" ${x.full?'disabled':''}>${x.d.getMonth()+1}/${x.d.getDate()}（${WK[x.d.getDay()]}）${[1,15].includes(lunarDay(x.d))?(lunarDay(x.d)==1?' 初一':' 十五'):''}${x.full?` 只剩 ${Math.max(0,x.left)} 個（不夠）`:x.left!==null?` 還可訂 ${x.left} 個`:''}</option>`).join('');
  if(L.some(x=>x.k==old&&!x.full))pd.value=old;else{const f=L.find(x=>!x.full);pd.value=f?f.k:''}
- const k=lead(n);document.getElementById('preRule').innerHTML=`📅 <b>${n} 個 = 預訂單</b>：要在取餐日的<b>${k==1?'前一天':k==2?'前兩天':'前三天'} 下午 3 點前</b>訂，最多可訂 30 天內。`+
-  (n>=30?'<br>💰 30 個以上：需付 <b>30% 訂金</b>（約 $'+Math.round(tot()*0.3)+'）或由店家<b>電話確認</b>後才成立。':'')+'<br>↩ 取餐<b>前一天</b>以前取消，訂金全額退還。';
+ const k=lead(n);document.getElementById('preRule').innerHTML=`📅 <b>${n} 個 = 預訂單</b>：要在取餐日的<b>前一天 下午 3 點前</b>訂，最多可訂 30 天內。`+
+  (n>=30?'<br>💰 <b>第一次訂大單需付 30% 訂金</b>（約 $'+Math.round(tot()*0.3)+'），<b>訂過的老客人免訂金</b>。送出後會告訴你要不要付。':'')+'<br>↩ 取餐<b>前兩天</b>以前取消，訂金全額退還；<b>前一天才取消不退</b>（菜已經買好了）。';
  preTimes()}
 function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
  addDay(sel,day,`${m}/${dd}（${WK[day.getDay()]}）`,null)}
@@ -182,11 +228,12 @@ async function sendGas(){if(!GAS_URL)return;txt();const v=id=>document.getElemen
  const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),date:cnt()>=PRE_MIN?v('pd'):'',total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
  const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),6000);
  try{const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),signal:ac&&ac.signal});
-  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id))window.SID=d.id;else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
+  const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id)){window.SID=d.id;if(d.pre)window.DEP=!!d.deposit}else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
 let sending=false;
 async function lineShare(){if(sending||!ok())return false;const b=document.getElementById('lineBtn'),old=b.textContent;
  sending=true;b.textContent='⏳ 傳送中…';b.style.opacity=.6;
  window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity=''}
  if(window.PREERR){alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',paused:'店裡現在暫停接今日訂單，請改選明天以後取餐 🙏',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
+ if(cnt()>=PRE_MIN&&window.DEP!==undefined)alert(window.DEP?'💰 這是你第一次訂大單，需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家會跟你聯絡。\n取餐前兩天以前取消，訂金全額退還；前一天才取消不退。':'🙏 你是老客人，這次大單免訂金！\n如要取消，請提早告訴店家。');
  location.href=lineUrl(txt());return false}
 </script></body></html>

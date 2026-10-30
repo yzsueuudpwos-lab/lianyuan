@@ -189,7 +189,7 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
  const ids=d.pending.map(o=>o.id);if(seen&&ids.some(i=>!seen.has(i)))ding();seen=new Set(ids);
  document.title=(ids.length?`(${ids.length}) `:'')+'蓮緣接單';
  $('list').innerHTML=d.pending.length?d.pending.map(o=>`<div class="card"><div class="who">${esc(o.name)}　<span class="sm">${esc(o.phone)}</span></div>
- <div class="tm">${o.pre?'📅【預訂單】':''}取餐 ${esc(o.pickup)}</div><pre>${esc(o.items)}</pre>${o.note?`<div class="nt">備註：${esc(o.note)}</div>`:''}
+ <div class="tm">${o.pre?'📅【預訂單】'+(o.deposit?'<b style="color:#c0392b">💰要收 30% 訂金（第一次訂大單）</b> ':'<b style="color:#2e7d32">老客人免訂金</b> '):''}取餐 ${esc(o.pickup)}</div><pre>${esc(o.items)}</pre>${o.note?`<div class="nt">備註：${esc(o.note)}</div>`:''}
  <div class="sm">合計 $${o.total}｜編號 ${esc(o.id)}｜${esc(String(o.time).slice(11,16))} 下單｜${o.line?'LINE 已連上 ✅':'LINE 還沒收到客人訊息'}</div>
  <div class="btns"><button class="ok" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','已接單')">✅ 接單並列印</button>
  <button class="no" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','售完')">❌ 售完</button></div></div>`).join(''):'<div class="empty">等待新訂單…</div>';
@@ -259,7 +259,7 @@ function priceOf(m){return +(ST.price||{})[m[1]]||m[2]}
 function showSet(on){document.body.classList.toggle('setmode',on);window.scrollTo(0,0);if(on){$('setBody').innerHTML='<div class="empty">讀取中…</div>';api({action:'settings'}).then(d=>{ST=d;newPrice={};tab(curTab)}).catch(e=>$('setBody').innerHTML='<div class="empty">⚠ 讀不到設定：'+esc(e)+'</div>')}}
 function save(d,msg){toast('儲存中…');return api({action:'save',data:JSON.stringify(d)}).then(r=>{ST=r;toast(msg||'已儲存 ✅');tab(curTab)}).catch(e=>say('請再按一次：'+e))}
 function tab(t){curTab=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));if(!ST)return;const B=$('setBody');
- if(t=='cal'){const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);let h='<div class="tip">綠色＝接預訂，灰色＝不接。<b>按日期</b>就切換。<br>按「上限」可設這天最多接幾個預訂便當。（10 個以上才算預訂）</div><div class="cal">'+[...WK].map(w=>`<div class="wk">${w}</div>`).join('');
+ if(t=='cal'){const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);let h='<div class="tip">綠色＝接預訂，灰色＝不接。<b>按日期</b>就切換。<br>按「上限」可設這天最多接幾個預訂便當。（30 個以上才算預訂）</div><div class="cal">'+[...WK].map(w=>`<div class="wk">${w}</div>`).join('');
   for(let i=0;i<start.getDay();i++)h+='<div class="day na"></div>';
   for(let i=0;i<PRE_DAYS;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i),k=ymd(d),o=ST.days[k]||{},op=o.off?false:o.on?true:baseOpen(d),lu=lunarDay(d),bk=+ST.booked[k]||0;
    h+=`<button class="day ${op?'op':'cl'}" onclick="flip('${k}')"><small>${d.getMonth()+1}月</small><b>${d.getDate()}</b><small>${op?'接預訂':'不接'}${lu==1?'・初一':lu==15?'・十五':''}</small>${bk?`<small>已訂 ${bk} 個</small>`:''}<span class="cap" onclick="event.stopPropagation();setCap('${k}')">${o.cap?'上限 '+o.cap:'上限：不限'}</span></button>`}
