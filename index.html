@@ -45,6 +45,11 @@ label{display:block;margin:10px 0 4px;font-size:14px}input,select,textarea{width
 pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font-size:14px}
 .card.so img{filter:grayscale(1);opacity:.6}.card.so .row{flex-wrap:wrap;gap:6px}.sold{background:#999;color:#fff;border-radius:14px;padding:6px 12px;font-size:15px;font-weight:700}
 .tbd{color:#c00;font-weight:700}
+.mdl{display:none;position:fixed;inset:0;background:#000a;z-index:50;align-items:center;justify-content:center;padding:18px}
+.mdl .bx{background:#fffaf0;border:3px solid var(--o);border-radius:20px;padding:22px 18px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 30px #0005}
+.mdl h3{font-size:24px;line-height:1.5;color:#c0392b;margin:6px 0 12px}.mdl p{font-size:20px;line-height:1.6;margin:12px 0 0;color:var(--t)}
+.mdl .bb{display:block;width:100%;border:0;border-radius:14px;padding:16px;font-size:22px;font-weight:700;margin-top:12px;text-decoration:none;box-sizing:border-box}
+.mdl .tl{background:var(--o);color:#fff}.mdl .ok{background:var(--g);color:#fff}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
@@ -71,6 +76,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 💬 LINE 官方帳號：@522ociyo　<a href="https://line.me/R/ti/p/@522ociyo" target="_blank">➕ 加入好友</a></div></section>
 <footer>蓮緣素食餐坊・統一編號 98919314<br>價格與外送平台同步，如有調整以店家為準<br><a href="print.html" style="color:#bbb">標籤列印（店員用）</a></footer>
 
+<div class="mdl" id="pauseMdl"><div class="bx"><div style="font-size:44px">🙏</div><h3>目前店員未上線<br>今天的餐點無法線上訂購</h3><p>請直接打電話：<b>02-2703-8823</b></p><a class="bb tl" href="tel:0227038823">📞 打電話</a><p>要預訂其他日期，可以繼續點餐</p><button class="bb ok" onclick="document.getElementById('pauseMdl').style.display='none'">繼續預訂其他日期</button></div></div>
 <div id="bar"><span id="sum">尚未選餐</span><button onclick="openSheet()">去結帳</button></div>
 <div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div class="in">
 <h2>確認訂單</h2><pre id="items"></pre>
@@ -104,7 +110,7 @@ render();
 function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
  function clean(){clearTimeout(t);delete window[cb];sc.remove()}window[cb]=d=>{clean();d&&d.ok?res(d):rej(d&&d.error)};sc.onerror=()=>{clean();rej('net')};
  sc.src=GAS_URL+'?'+new URLSearchParams({...p,callback:cb,_:Date.now()});document.body.appendChild(sc)})}
-function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];m[2]=p>0?p:MENU[i][2];});render();upd();banner()}).catch(()=>{})}
+function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];m[2]=p>0?p:MENU[i][2];});render();upd();banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{})}
 banner();setInterval(()=>loadS(),120000);
 loadS();
 function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.max(0,q[i]+d);document.getElementById('q'+i).textContent=q[i];upd()}
