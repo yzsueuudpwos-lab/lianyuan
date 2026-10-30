@@ -140,7 +140,9 @@ body.phone #goSt{font-size:18px}body.phone #goPeek{font-size:16px}
 #backGo{display:none;width:100%;font-size:20px;padding:12px;border:0;border-radius:14px;background:#fff3c4;margin-bottom:10px}body.offmode.peek #backGo{display:block}
 .card.rq{border:5px solid #c0392b!important;background:#fff5f3!important}.rqh{background:#c0392b;color:#fff;font-size:26px;font-weight:800;padding:10px 12px;border-radius:10px;margin-bottom:8px;text-align:center}
 .btns .yes{background:#c0392b!important;color:#fff}.btns .keep{background:#2e7d32!important;color:#fff}.done.cc{background:#e4e4e4!important;color:#777;border-left:6px solid #999}.done.cc .cct{background:#777;color:#fff;border-radius:6px;padding:1px 8px;font-weight:700}
-</style></head><body>
+.card.ring{animation:rg 1s infinite}@keyframes rg{50%{box-shadow:0 0 0 8px #f39c12}}
+#sndBan{display:none;position:fixed;left:0;right:0;top:0;z-index:999;background:#c0392b;color:#fff;font-size:30px;font-weight:800;text-align:center;padding:22px 10px;cursor:pointer}
+</style></head><body><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
 <header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="viewBtn" onclick="setView(!document.body.classList.contains('phone'))">💻 平板版</button><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
@@ -206,19 +208,29 @@ function api(p){return new Promise((res,rej)=>{if(!GAS_URL)return rej('尚未設
  s.src=GAS_URL+'?'+new URLSearchParams({...p,pin:PIN,callback:cb,_:Date.now()});document.body.appendChild(s)})}
 function savePin(){PIN=$('pinIn').value.trim();if(!PIN)return;unlockAudio();api({action:'list'}).then(d=>{localStorage.ly_pin=PIN;$('pin').style.display='none';render(d);start()}).catch(e=>{$('pinErr').textContent=e=='pin'?'密碼不對':'錯誤：'+e})}
 // 叮聲（第一次點畫面後才能出聲）
-function unlockAudio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}}
-function ding(){try{unlockAudio();[0,0.35,0.7].forEach(d=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=1320;o.connect(g);g.connect(AC.destination);
+function unlockAudio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const r=AC.resume();if(r&&r.then)r.then(sndBan,sndBan);
+ const b=AC.createBuffer(1,1,22050),src=AC.createBufferSource();src.buffer=b;src.connect(AC.destination);src.start(0)}catch(e){}sndBan()} // iOS：要在點擊當下播一次靜音才會解鎖
+function sndOk(){return !!AC&&AC.state=='running'}
+function sndBan(){const e=$('sndBan');if(e)e.style.display=PIN&&!sndOk()?'block':'none'}
+let ALRT=new Set(),alrtT=null;window.__beeps=0;
+function alarm(){clearInterval(alrtT);alrtT=null;if(!ALRT.size)return;ding();alrtT=setInterval(()=>{if(!ALRT.size){clearInterval(alrtT);alrtT=null;return}ding()},4000)}
+function ack(id){if(ALRT.delete(String(id))&&!ALRT.size){clearInterval(alrtT);alrtT=null}}
+function ding(){window.__beeps++;sndBan();try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state!='running')AC.resume();[0,0.35,0.7].forEach(d=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=1320;o.connect(g);g.connect(AC.destination);
  const t=AC.currentTime+d;g.gain.setValueAtTime(0.6,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);o.start(t);o.stop(t+0.3)})}catch(e){}
  if(navigator.vibrate)navigator.vibrate([400,200,400,200,400])}
-document.addEventListener('click',unlockAudio);
+['pointerdown','touchstart','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{capture:true,passive:true}));
 async function wake(){try{if(navigator.wakeLock)await navigator.wakeLock.request('screen')}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){wake();poll()}});
 function parseItems(s){return String(s).split('\n').map(l=>{const m=l.match(/^(.+?)\s*x(\d+)\s*$/);return m?{n:m[1].trim(),q:+m[2]}:null}).filter(Boolean)}
 function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent=`今天：${d.count} 份｜$${d.total}`;$('conn').textContent='✅ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
- const ids=d.pending.map(o=>o.id+'|'+o.status);if(seen&&ids.some(i=>!seen.has(i))){ding();const rq=d.pending.find(o=>o.status=='申請取消'&&!seen.has(o.id+'|'+o.status));if(rq)toast('🙋 '+rq.name+' 申請取消訂單，請決定')}seen=new Set(ids);
+ const ids=d.pending.map(o=>o.id+'|'+o.status),now=new Set(d.pending.map(o=>String(o.id)));
+ [...ALRT].forEach(i=>{if(!now.has(i))ALRT.delete(i)}); // 已經不在待處理就不用再響
+ const nu=d.pending.filter(o=>!(seen&&seen.has(o.id+'|'+o.status)));nu.forEach(o=>ALRT.add(String(o.id)));
+ if(nu.length&&!alrtT)alarm();else if(!ALRT.size)alarm();
+ if(seen&&nu.length){const rq=d.pending.find(o=>o.status=='申請取消'&&!seen.has(o.id+'|'+o.status));if(rq)toast('🙋 '+rq.name+' 申請取消訂單，請決定')}seen=new Set(ids);
  const cc=d.done.filter(o=>o.status=='客人已取消').map(o=>o.id);if(seenCC){const nw=d.done.find(o=>o.status=='客人已取消'&&!seenCC.has(o.id));if(nw){ding();toast('🙅 '+nw.name+' 自己取消了訂單（不用做）')}}seenCC=new Set(cc);
  document.title=(ids.length?`(${ids.length}) `:'')+'蓮緣接單';
- $('list').innerHTML=d.pending.length?d.pending.map(o=>`<div class="card${o.status=='申請取消'?' rq':''}">${o.status=='申請取消'?'<div class="rqh">🙋 客人申請取消（這張已接單）</div>':''}<div class="who">${esc(o.name)}　<span class="sm">${esc(o.phone)}</span></div>
+ $('list').innerHTML=d.pending.length?d.pending.map(o=>`<div class="card${o.status=='申請取消'?' rq':''}${ALRT.has(String(o.id))?' ring':''}" onclick="ack('${esc(o.id)}');this.classList.remove('ring')">${o.status=='申請取消'?'<div class="rqh">🙋 客人申請取消（這張已接單）</div>':''}<div class="who">${esc(o.name)}　<span class="sm">${esc(o.phone)}</span></div>
  <div class="tm">${o.pre?'📅【預訂單】'+(o.deposit?'<b style="color:#c0392b">💰要收 30% 訂金（第一次訂大單）</b> ':(parseItems(o.items).reduce((t,i)=>t+i.q,0)>=30?'<b style="color:#2e7d32">老客人免訂金</b> ':'')):''}取餐 ${esc(o.pickup)}</div><pre>${esc(o.items)}</pre>${o.note?`<div class="nt">備註：${esc(o.note)}</div>`:''}
  <div class="sm">合計 $${o.total}｜編號 ${esc(o.id)}｜${esc(String(o.time).slice(11,16))} 下單｜${o.line?'LINE 已連上 ✅':'LINE 還沒收到客人訊息'}</div>
  <div class="btns">${o.status=='申請取消'?`<button class="yes" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','同意取消')">🗑️ 同意取消</button>
@@ -241,10 +253,11 @@ async function toggleOnline(){const want=!ONLINE.open;
  $('onBtn').disabled=true;api({action:'online',on:want?1:0}).then(r=>{showOnline(r.online);toast(r.online.open?'已上線，開始接今天的單 ✅':want?'已過 19:30，今天不能再上線':'已暫停接今天的單')})
  .catch(e=>say('請再按一次：'+e)).finally(()=>$('onBtn').disabled=false)}
 function quota(){api({action:'quota'}).then(q=>{$('quota').textContent=q.enabled===false?'':q.limit?`LINE 本月 ${q.used}/${q.limit} 則`:(q.used!=null?`LINE 本月 ${q.used} 則`:'')}).catch(()=>{})}
+setInterval(sndBan,3000);
 function poll(){if(!PIN||!GAS_URL)return;api({action:'list'}).then(render).catch(e=>{if(e=='pin'){localStorage.removeItem('ly_pin');location.reload()}$('conn').textContent='⚠ '+e})}
 function start(){wake();poll();setInterval(poll,POLL);quota();setInterval(quota,600000)}
 function find(id){return data.pending.concat(data.done).find(o=>o.id==id)}
-async function act(id,st){const o=find(id);if(!o)return;const lab=st;if(st=='同意取消')st='取消';
+async function act(id,st){ack(id);const o=find(id);if(!o)return;const lab=st;if(st=='同意取消')st='取消';
  if(st=='售完'&&!(await ask({ic:'❌',t:'確定這張單「售完」？',m:'會自動用 LINE 通知客人',ok:'確定售完',okc:'rd'})))return;
  if(lab=='取消'&&!(await ask({ic:'🚫',t:`確定取消 ${o.name} 的訂單？`,m:`編號 ${o.id}\n會自動用 LINE 通知客人`,ok:'確定取消',okc:'rd',no:'不要'})))return;
  if(st=='已接單')printOrder(o); // 先印（要在按下按鈕的當下開 RawBT）
@@ -363,7 +376,7 @@ async function gotPic(inp){const f=inp.files&&inp.files[0];if(!f)return;const st
  catch(e){picShow(EPH);st.className='bad';st.textContent='❌ '+e;say('照片沒有上傳成功：\n'+e)}finally{$('edSave').disabled=false}}
 $('size').value=localStorage.ly_size||'40';setSize();$('mode').value=localStorage.ly_mode||'rawbt';$('skip').checked=!!localStorage.ly_skip;
 if(!GAS_URL){$('conn').textContent='⚠ 尚未設定後端網址'}
-if(PIN){$('pin').style.display='none';start()}else $('pin').style.display='flex';
+if(PIN){$('pin').style.display='none';start();unlockAudio()}else $('pin').style.display='flex';
 </script><script>
 // 📱 手機版／💻 平板版：第一次依螢幕寬度自動選，之後記住
 function setView(p,save){document.body.classList.toggle('phone',p);const b=document.getElementById('viewBtn');if(b)b.innerHTML=p?'<u>📱 手機版</u> / 💻 平板版':'📱 手機版 / <u>💻 平板版</u>';if(save!==false)localStorage.ly_view=p?'phone':'tablet'}
