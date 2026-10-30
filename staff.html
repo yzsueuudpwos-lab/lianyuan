@@ -111,12 +111,39 @@ body.setmode{background:#f2f2f7}body.setmode header{display:none}
 .sbtn{flex:none;min-width:120px;min-height:52px;padding:8px 14px;border:0;border-radius:14px;font-size:19px;font-weight:700;color:#fff;background:#2e8b3d}.sbtn.x{background:#c0392b}
 @media(min-width:700px){.sbtn{min-width:180px;min-height:64px;font-size:24px}.row .nm{font-size:22px}}
 @media print{#setv,header,main,#pin,#toast{display:none!important}body{background:#fff}#labels{display:block}.lab{page-break-after:always;break-after:page}}
+/* ===== 📱 手機版接單（body.phone；平板版完全不變）===== */
+#viewBtn{font-size:22px;font-weight:700;padding:10px 14px;border:0;border-radius:14px;background:#fff;color:#3f7d3a}
+body.phone{font-size:18px}
+body.phone header{padding:calc(8px + env(safe-area-inset-top)) 10px 8px;gap:6px}
+body.phone header b{font-size:22px;flex:1}body.phone #stat{font-size:17px;order:5;flex:1 1 100%}body.phone #conn,body.phone #quota{font-size:14px;order:6}
+body.phone #viewBtn,body.phone #setBtn{font-size:16px;padding:10px 10px;min-height:44px}
+body.phone main{padding:10px}
+body.phone #onBtn{font-size:24px;padding:16px 8px;border-width:4px;border-radius:18px;position:sticky;top:96px;z-index:4}
+body.phone #onTip{font-size:16px;margin-bottom:10px}
+body.phone .card{padding:14px;border-left-width:8px;border-radius:16px;margin-bottom:14px}
+body.phone .card .who{font-size:26px}body.phone .card .tm{font-size:20px}body.phone .card pre{font-size:24px}
+body.phone .card .sm{font-size:15px}body.phone .card .nt{font-size:19px}
+body.phone .btns{flex-direction:column;gap:10px}body.phone .btns button{font-size:26px;padding:20px 8px;min-height:68px}
+body.phone .manual{font-size:20px}body.phone h2{font-size:20px}
+body.phone .done{font-size:16px;flex-direction:column;align-items:stretch}body.phone .done button{font-size:18px;padding:12px 16px;min-height:44px}
+body.phone .lno,body.phone .lok{white-space:normal;font-size:15px}
+body.phone .set{font-size:16px;line-height:2.2}body.phone .set select{font-size:16px}
+body.phone #toast{font-size:18px}
+/* ===== 大圓「上線」畫面（像外送司機 App）===== */
+#goView{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 120px);text-align:center;gap:18px;background:radial-gradient(circle at 50% 42%,#eaf6e4 0,#fffaf0 60%);border-radius:24px;padding:20px 10px}
+body.offmode:not(.peek) main>*:not(#goView){display:none}body.offmode:not(.peek) #goView{display:flex}
+#goBtn{width:min(62vw,340px);height:min(62vw,340px);border-radius:50%;border:10px solid #fff;background:radial-gradient(circle at 35% 30%,#bde8b0,#6fbf73 70%);color:#fff;font-size:min(13vw,76px);font-weight:800;text-shadow:0 2px 6px #2e7d3299;box-shadow:0 0 0 0 #6fbf7380,0 12px 30px #2e7d3255;animation:pulse 2s infinite;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#goBtn small{font-size:min(9vw,48px);text-shadow:none}#goBtn:active{transform:scale(.95)}#goBtn:disabled{animation:none;filter:grayscale(.8)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #6fbf7399,0 12px 30px #2e7d3255}70%{box-shadow:0 0 0 34px #6fbf7300,0 12px 30px #2e7d3255}100%{box-shadow:0 0 0 0 #6fbf7300,0 12px 30px #2e7d3255}}
+#goSt{font-size:26px;color:#555;line-height:1.5}#goSt b{color:#c0392b}#goPeek{font-size:20px;background:none;border:0;color:#3f7d3a;text-decoration:underline;padding:12px}
+body.phone #goSt{font-size:18px}body.phone #goPeek{font-size:16px}
+#backGo{display:none;width:100%;font-size:20px;padding:12px;border:0;border-radius:14px;background:#fff3c4;margin-bottom:10px}body.offmode.peek #backGo{display:block}
 </style></head><body>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
-<header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
+<header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="viewBtn" onclick="setView(!document.body.classList.contains('phone'))">💻 平板版</button><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
 <main>
-<button id="onBtn" class="off" onclick="toggleOnline()">🔴 暫停接單（按這裡上線）</button><div id="onTip">今天還沒上線，客人只能預訂明天以後</div>
+<div id="goView"><div style="font-size:30px;font-weight:700;color:#3f7d3a">🥬🍱 蓮緣素食 🥕</div><button id="goBtn" onclick="goOnline()">上線<small>🌱</small></button><div id="goSt"><b>● 目前暫停接單</b><br>按大圓圈開始接今天的單</div><button id="goPeek" onclick="document.body.classList.add('peek')">先看訂單（不上線）</button></div><button id="backGo" onclick="document.body.classList.remove('peek')">← 回到上線畫面</button><button id="onBtn" class="off" onclick="toggleOnline()">🔴 暫停接單（按這裡上線）</button><div id="onTip">今天還沒上線，客人只能預訂明天以後</div>
 <div id="manual"></div>
 <div id="list"><div class="empty">等待新訂單…</div></div>
 <h2>今天處理過的</h2><div id="done"></div>
@@ -201,9 +228,10 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
 let ONLINE={open:false,why:'paused'},manualWhy={};
 // 後台回的 reply 例如「⚠ 取消 15:02 客人沒有在 LINE 傳訂單編號…」→ 只留原因
 function why(r){return String(r||'').replace(/^[⚠✅]\s*\S+\s+\d\d:\d\d\s*/,'').trim()}
-function showOnline(o){if(o)ONLINE=o;const b=$('onBtn');b.className=ONLINE.open?'on':'off';
+function showOnline(o){if(o)ONLINE=o;document.body.classList.toggle('offmode',!ONLINE.open);if(ONLINE.open)document.body.classList.remove('peek');$('goBtn').disabled=ONLINE.why=='late';$('goSt').innerHTML=ONLINE.why=='late'?'<b>● 已過 19:30</b><br>今天自動停止接單，預訂明天以後照常':'<b>● 目前暫停接單</b><br>按大圓圈開始接今天的單（預訂照常收）';const b=$('onBtn');b.className=ONLINE.open?'on':'off';
  b.textContent=ONLINE.open?'🟢 接單中（按這裡暫停）':'🔴 暫停接單（按這裡上線）';
  $('onTip').textContent=ONLINE.open?'客人可以訂今天的便當。太忙就按上面暫停。':ONLINE.why=='late'?'已過 19:30，今天自動停止接單；預訂明天以後照常':'客人現在不能訂今天的；預訂明天以後照常'}
+function goOnline(){unlockAudio&&unlockAudio();$('goBtn').disabled=true;api({action:'online',on:1}).then(r=>{showOnline(r.online);toast(r.online.open?'已上線，開始接今天的單 ✅':'已過 19:30，今天不能再上線');scrollTo(0,0)}).catch(e=>say('請再按一次：'+e)).finally(()=>{$('goBtn').disabled=ONLINE.why=='late'})}
 async function toggleOnline(){const want=!ONLINE.open;
  if(!(await ask(want?{ic:'🟢',t:'確定上線，開始接今天的單？',m:'客人就可以訂今天取餐的便當',ok:'確定上線',okc:'gr'}:{ic:'⏸️',t:'確定暫停接今天的單？',m:'客人不能再訂今天取餐的便當\n（預訂明天以後照常）',ok:'確定暫停',okc:'rd'})))return;
  $('onBtn').disabled=true;api({action:'online',on:want?1:0}).then(r=>{showOnline(r.online);toast(r.online.open?'已上線，開始接今天的單 ✅':want?'已過 19:30，今天不能再上線':'已暫停接今天的單')})
@@ -332,4 +360,8 @@ async function gotPic(inp){const f=inp.files&&inp.files[0];if(!f)return;const st
 $('size').value=localStorage.ly_size||'40';setSize();$('mode').value=localStorage.ly_mode||'rawbt';$('skip').checked=!!localStorage.ly_skip;
 if(!GAS_URL){$('conn').textContent='⚠ 尚未設定後端網址'}
 if(PIN){$('pin').style.display='none';start()}else $('pin').style.display='flex';
+</script><script>
+// 📱 手機版／💻 平板版：第一次依螢幕寬度自動選，之後記住
+function setView(p,save){document.body.classList.toggle('phone',p);const b=document.getElementById('viewBtn');if(b)b.innerHTML=p?'<u>📱 手機版</u> / 💻 平板版':'📱 手機版 / <u>💻 平板版</u>';if(save!==false)localStorage.ly_view=p?'phone':'tablet'}
+setView(localStorage.ly_view?localStorage.ly_view==='phone':Math.min(screen.width,innerWidth)<600,false);
 </script></body></html>
