@@ -18,7 +18,8 @@ header{position:sticky;top:0;z-index:5;background:#fff;box-shadow:0 1px 6px #000
 .top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
 .top b{font-size:19px;color:var(--g)}.top a{color:var(--g);text-decoration:none;font-size:14px}
 nav{display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px}
-nav a{flex:none;padding:7px 14px;border-radius:20px;background:var(--g2);color:var(--g);text-decoration:none;font-size:15px}
+nav a{flex:none;padding:7px 14px;border-radius:20px;background:var(--g2);color:var(--g);text-decoration:none;font-size:15px;white-space:nowrap}
+#catNav{display:contents}
 .hero{position:relative}.hero img{width:100%;height:220px;object-fit:cover;display:block}
 .hero div{position:absolute;inset:auto 0 0 0;padding:16px;background:linear-gradient(transparent,#000a);color:#fff}
 .hero h1{margin:0;font-size:24px}.hero p{margin:4px 0 0;font-size:14px}
@@ -51,10 +52,11 @@ pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font
 .mdl .bb{display:block;width:100%;border:0;border-radius:14px;padding:16px;font-size:22px;font-weight:700;margin-top:12px;text-decoration:none;box-sizing:border-box}
 .mdl .tl{background:var(--o);color:#fff}.mdl .ok{background:var(--g);color:#fff}
 .qty input.qin{width:64px;height:44px;font-size:22px;font-weight:700;text-align:center;padding:2px;border:2px solid var(--g);border-radius:10px;background:#fff;color:var(--t)}
+.lim{display:inline-block;background:#fdecea;color:#c0392b;border-radius:10px;padding:3px 10px;font-size:15px;font-weight:700;margin-top:4px}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
-<nav><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
+<nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
 <div class="hero"><img src="店家封面.jpg" alt="蓮緣素食"><div><h1>蓮緣素食餐坊</h1><p>純素便當・手工素餃・港式蘿蔔糕｜光復南路410號</p></div></div>
 
 <div id="pauseBan" style="display:none;margin:12px 14px 0;background:#fff3e6;border:2px solid #e0a800;border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.6;font-weight:700;color:#8a4b00"></div>
@@ -64,9 +66,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <p class="note">🏪 目前只提供現場取餐</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <p class="note">📅 <b>10 個以上請預訂</b>：前一天下午 3 點前訂；30 個以上前兩天、50 個以上前三天；最多可訂 30 天內。30 個以上需付 30% 訂金或電話確認，前一天以前取消全額退款。</p></section>
 
-<section id="c1"><h2>人氣餐盒</h2><p class="note">純素料理｜配菜依當日時蔬，與照片不一定相同</p><div id="l1"></div></section>
-<section id="c2"><h2>套餐</h2><p class="note">附湯，菜由店家自行選配</p><div id="l2"></div></section>
-<section id="c3"><h2>單點</h2><div id="l3"></div></section>
+<div id="menuSecs"></div>
 
 
 <section id="info"><h2>店家資訊</h2><div class="info">
@@ -86,7 +86,7 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
 <div id="preBox" style="display:none"><div class="info" id="preRule" style="background:#fff3e6;font-size:14px;line-height:1.6"></div>
 <label>預訂日期</label><select id="pd" onchange="preTimes()" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select></div>
-<label>取餐時間</label><select id="tm" style="width:100%;font-size:20px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="offHint" style="display:none;color:#c0392b;font-weight:700">店裡暫停接今日訂單，請選明天以後取餐 🙏</p><p class="note" id="tmHint">上午 10:30–下午 1:50、下午 4:30–7:50，每 10 分鐘一個時段，下單後最快 10 分鐘可取；週日休息</p>
+<label>取餐時間</label><select id="tm" style="width:100%;font-size:20px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="offHint" style="display:none;color:#c0392b;font-weight:700">店裡暫停接今日訂單，請選明天以後取餐 🙏</p><p class="note" id="limHint" style="display:none;color:#c0392b;font-weight:700;font-size:16px">🧧 有限定期間的餐點，只能選限定的日子取餐</p><p class="note" id="tmHint">上午 10:30–下午 1:50、下午 4:30–7:50，每 10 分鐘一個時段，下單後最快 10 分鐘可取；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
 <p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <a class="btn line" id="lineBtn" href="#" onclick="lineShare();return false" style="font-size:19px;padding:16px">💬 用 LINE 送出訂單</a>
@@ -97,21 +97,32 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <script src="menu.js"></script>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上）
-const M=MENU.map(m=>m.slice());
-const q=M.map(()=>0);
+// 菜單：[分類, 品名, 價錢, 說明, 照片, {lim,from,to}]；先用 menu.js 的備用菜單，讀到後台「菜單」表就換掉
+const CATN={1:'人氣餐盒',2:'套餐',3:'單點'},CATNOTE={'人氣餐盒':'純素料理｜配菜依當日時蔬，與照片不一定相同','套餐':'附湯，菜由店家自行選配'};
+let M=MENU.map(m=>[CATN[m[0]],m[1],m[2],m[3],m[4]?m[4]+'.jpg':'',{}]);
+let q=M.map(()=>0);
+function okImg(u){u=String(u||'');return /^https:\/\/lh3\.googleusercontent\.com\//.test(u)||/^[^\/:?#"'<>\\]+\.(jpg|jpeg|png)$/i.test(u)?u:''}
+function setMenu(list){const t=ymd(new Date()),old={};M.forEach((m,i)=>old[m[1]]=q[i]);
+ M=list.filter(x=>x.on&&!(x.lim&&x.to&&x.to<t)).map(x=>[x.cat||'單點',x.name,+x.price||0,x.desc||'',okImg(x.photo),{lim:!!x.lim,from:x.from,to:x.to}]);q=M.map(m=>old[m[1]]||0)}
+function md(k){const [y,m,d]=String(k).split('-').map(Number);return m+'/'+d}
+// 購物車裡有「限定期間」的品項 → 只能選那段日期取餐
+function dayAllowed(day){const k=ymd(day);return M.every((m,i)=>!q[i]||!m[5].lim||(k>=m[5].from&&k<=m[5].to))}
+function hasLim(){return M.some((m,i)=>q[i]&&m[5].lim)}
 let S={price:{},photo:{},soldOut:{},days:{},booked:{},open:false,why:'paused'};
 const BAN={paused:'現在店裡很忙，暫停接今日訂單，忙完就會恢復 🙏 可以先預訂明天以後的便當',late:'今天已過接單時間（19:30），可以先預訂明天以後的便當 🙏'};
 function banner(){const b=document.getElementById('pauseBan');if(!b)return;b.style.display=S.open?'none':'block';b.textContent=BAN[S.why]||BAN.paused}
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function imgOf(m){const u=S.photo[m[1]];return /^https:\/\/lh3\.googleusercontent\.com\//.test(u||'')?u:(m[4]?m[4]+'.jpg':'')}
-function render(){[1,2,3].forEach(c=>document.getElementById('l'+c).innerHTML='');
-M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m);document.getElementById('l'+m[0]).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3><p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
+function imgOf(m){if(S.menu)return m[4];const u=S.photo[m[1]];return /^https:\/\/lh3\.googleusercontent\.com\//.test(u||'')?u:m[4]}
+function render(){const cats=[];M.forEach(m=>{if(!cats.includes(m[0]))cats.push(m[0])});const sid=c=>{const k=Object.keys(CATN).find(k=>CATN[k]==c);return k?'c'+k:'cx'+cats.indexOf(c)};
+ document.getElementById('menuSecs').innerHTML=cats.map((c,j)=>`<section id="${sid(c)}"><h2>${esc(c)}</h2>${CATNOTE[c]?`<p class="note">${CATNOTE[c]}</p>`:''}<div id="L${j}"></div></section>`).join('');
+ document.getElementById('catNav').innerHTML=cats.map(c=>`<a href="#${sid(c)}">${esc(c)}</a>`).join('');
+M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m),L=m[5].lim?`<span class="lim">🧧 限定 ${md(m[5].from)}–${md(m[5].to)} 取餐</span>`:'';document.getElementById('L'+cats.indexOf(m[0])).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3>${L}<p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
 render();
 // 讀店家設定（價錢、照片、今天賣完、預訂日曆）；讀不到就用 menu.js 的預設值
 function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
  function clean(){clearTimeout(t);delete window[cb];sc.remove()}window[cb]=d=>{clean();d&&d.ok?res(d):rej(d&&d.error)};sc.onerror=()=>{clean();rej('net')};
  sc.src=GAS_URL+'?'+new URLSearchParams({...p,callback:cb,_:Date.now()});document.body.appendChild(sc)})}
-function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];m[2]=p>0?p:MENU[i][2];});render();upd();banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{})}
+function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;if(Array.isArray(d.menu))setMenu(d.menu);else{S.menu=null;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];if(p>0)m[2]=p})}render();upd();banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{})}
 banner();setInterval(()=>loadS(),120000);
 loadS();
 function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.min(999,Math.max(0,q[i]+d));document.getElementById('q'+i).value=q[i];upd()}
@@ -136,7 +147,7 @@ function addDay(sel,day,label,earliest){const wk='日一二三四五六';let any
   for(const m of slotMins()){if(m<lo||m>=hi)continue;const t=new Date(day.getTime()+m*6e4);if(earliest&&t<earliest)continue;const o=document.createElement('option');o.value=`${t.getMonth()+1}/${t.getDate()}（${wk[t.getDay()]}）${fmt(t)}`;o.textContent=fmt(t);g.appendChild(o)}
   if(g.children.length){sel.appendChild(g);any=true}}return any}
 function buildSlots(){const sel=document.getElementById('tm');sel.innerHTML='';const now=new Date(),earliest=new Date(now.getTime()+LEAD*6e4);const wk='日一二三四五六';let n=0;const soT=M.some((m,i)=>q[i]&&S.soldOut[m[1]]),off=!S.open||now.getHours()*60+now.getMinutes()>=1170;document.getElementById('soHint').style.display=soT&&!off?'block':'none';document.getElementById('offHint').style.display=off?'block':'none';
-for(let i=0;i<7&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0||(i==0&&(soT||off)))continue;const label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
+const lim=hasLim();document.getElementById('limHint').style.display=lim?'block':'none';for(let i=0;i<(lim?400:7)&&n<3;i++){const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(day.getDay()==0||(i==0&&(soT||off))||!dayAllowed(day))continue;const label=(i==0?'今天':i==1?'明天':'')+` ${day.getMonth()+1}/${day.getDate()}（${wk[day.getDay()]}）`;
 if(addDay(sel,day,label,earliest))n++}}
 buildSlots();
 // ===== 預訂（10 個以上）=====
@@ -149,7 +160,7 @@ function baseOpen(d){return d.getDay()!=0||[1,15].includes(lunarDay(d))} // 週�
 function dayOpen(d){const o=S.days[ymd(d)]||{};return o.off?false:o.on?true:baseOpen(d)}
 function preDates(n){const now=new Date(),out=[];
  for(let i=1;i<=PRE_DAYS;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i),k=ymd(d);
-  if(i<lead(n)||(i==lead(n)&&now.getHours()>=CUTOFF)||!dayOpen(d))continue;
+  if(i<lead(n)||(i==lead(n)&&now.getHours()>=CUTOFF)||!dayOpen(d)||!dayAllowed(d))continue;
   const cap=+(S.days[k]||{}).cap||0,left=cap?cap-(+S.booked[k]||0):null;out.push({d,k,left,full:left!==null&&left<n})}return out}
 function setMode(){const n=cnt(),pre=n>=PRE_MIN,box=document.getElementById('preBox');box.style.display=pre?'block':'none';document.getElementById('tmHint').style.display=pre?'none':'block';
  if(!pre){buildSlots();return}
