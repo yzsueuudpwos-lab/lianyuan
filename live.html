@@ -187,6 +187,7 @@ function oneCard(no){const o=OR.get(no),got=GOTS.includes(no);let h;
  else{const done=got||(o.stage=='done'&&!o.auto),k=done?3:{counter:0,kitchen:1,ready:2,done:3}[o.stage],est=o.auto&&!done?'<span class="est">預計</span>':'';
   h='<div class="no">👑 你的便當 #'+esc(short(no))+'</div><div class="sl">'+est+['店家確認中','廚房製作中','好了！到櫃檯取餐 🎉','取餐完成，謝謝光臨 🙏'][k]+(o.slot?'・'+esc(o.slot)+' 取餐':'')+'</div><div class="steps">'+STEP.map((x,i)=>'<span class="'+(i<=k?'on':'')+'"><i>'+x[0]+'</i>'+(i==k&&est?'預計':'')+x[1]+'</span>').join('')+'</div>';
   if(!done&&o.stage!='counter')h+=ASK[no]?'<div class="ph">電話末三碼<input id="ph_'+esc(no)+'" inputmode="numeric" maxlength="3" autocomplete="off"><button onclick="gotIt(\''+esc(no)+'\')">確認</button></div>':'<button class="got" onclick="gotIt(\''+esc(no)+'\')">我拿到了 👍</button>';
+  if(!done&&o.stage!='ready'&&MINE.get(no))h+='<a class="cx" href="index.html?cancel='+encodeURIComponent(no)+'&t='+encodeURIComponent(MINE.get(no))+'" style="display:block;margin-top:8px;text-align:center;color:#c0392b;font-size:14px;border:1.5px solid #e6b0aa;border-radius:10px;padding:7px;text-decoration:none">取消這張訂單</a>';
   if(GM[no])h+='<div class="gm">'+esc(GM[no])+'</div>'}
  return '<div class="my">'+h+'</div>'}
 function myCard(){const m=$('my');let h;
