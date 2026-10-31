@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>蓮緣接單</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#3f7d3a">
 <link rel="icon" href="icon.png"><script src="menu.js"></script><link rel="apple-touch-icon" href="icon.png">
-<style id="pagecss">@page{size:40mm 30mm;margin:0}</style>
+<style id="pagecss">@page{size:40mm 30mm;margin:0}.sg{background:#fff3c4;border:1px solid #e0a800;border-radius:8px;font-weight:700}.sgd{color:#4c9e3a;font-size:13px}</style>
 <style>
 body{margin:0;font-family:"Noto Sans TC","PingFang TC",sans-serif;background:#f5f5f0;color:#222;font-size:26px}
 header{background:#3f7d3a;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5}
@@ -142,6 +142,10 @@ body.phone #goSt{font-size:18px}body.phone #goPeek{font-size:16px}
 .btns .yes{background:#c0392b!important;color:#fff}.btns .keep{background:#2e7d32!important;color:#fff}.done.cc{background:#e4e4e4!important;color:#777;border-left:6px solid #999}.done.cc .cct{background:#777;color:#fff;border-radius:6px;padding:1px 8px;font-weight:700}
 .card.ring{animation:rg 1s infinite}@keyframes rg{50%{box-shadow:0 0 0 8px #f39c12}}
 #sndBan{display:none;position:fixed;left:0;right:0;top:0;z-index:999;background:#c0392b;color:#fff;font-size:30px;font-weight:800;text-align:center;padding:22px 10px;cursor:pointer}
+
+.done button.sg.big,body.phone .done button.sg.big{display:inline-block;min-width:150px;min-height:64px;padding:10px 18px;margin:4px 6px 4px 0;font-size:24px;font-weight:800;border-radius:14px;background:#ffd84d;border:2px solid #e0a800;color:#4a3000;touch-action:manipulation}.done button.sg.big.r,body.phone .done button.sg.big.r{background:#4c9e3a;border-color:#2f6b22;color:#fff}.sg.big:active{transform:scale(.97)}
+.done.late{background:#fff6c2;box-shadow:0 0 0 3px #e0a800 inset;animation:lateBlink 2.4s ease-in-out infinite}.lt{display:block;color:#a06a00;font-size:15px;margin:2px 0}
+@keyframes lateBlink{0%,100%{background:#fff6c2}50%{background:#ffe680}}@media(prefers-reduced-motion:reduce){.done.late{animation:none}}
 </style></head><body><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
@@ -236,9 +240,9 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
  <div class="btns">${o.status=='申請取消'?`<button class="yes" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','同意取消')">🗑️ 同意取消</button>
  <button class="keep" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','不同意取消')">🍳 已經在做了，不能取消</button>`:`<button class="ok" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','已接單')">✅ 接單並列印</button>
  <button class="no" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','售完')">❌ 售完</button>`}</div></div>`).join(''):'<div class="empty">等待新訂單…</div>';
- $('done').innerHTML=d.done.map(o=>`<div class="done${o.status=='客人已取消'?' cc':''}"><span>${{'已接單':'✅','售完':'❌','取消':'🚫','客人已取消':'🙅'}[o.status]||''} ${o.status=='客人已取消'?'<span class="cct">客人已取消・不用做</span>':esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜$${o.total}
+ $('done').innerHTML=d.done.map(o=>`<div class="done${o.status=='客人已取消'?' cc':''}${o.late?' late':''}"><span>${{'已接單':'✅','售完':'❌','取消':'🚫','客人已取消':'🙅'}[o.status]||''} ${o.status=='客人已取消'?'<span class="cct">客人已取消・不用做</span>':esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜$${o.total}
  ${o.status=='客人已取消'?'':String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':`<span class="lno">請手動回覆${why(o.reply)?'（'+esc(why(o.reply))+'）':''}</span>`}</span>
- <span>${o.status=='已接單'?`<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
+ <span>${o.status=='已接單'?`${o.late?`<b class="lt">⏰ 過了取餐時間 ${esc(slotTxt(o.pickup))}</b>`:''}${o.stage=='picked'?'<b class="sgd">👋 已取貨 ✔</b> ':`<button class="sg big${o.stage=='ready'?' r':''}" onclick="stgNext('${esc(o.id)}')">${o.stage=='ready'?'👋 已取貨':'🍱 做好了'}</button> `}<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
  $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}${manualWhy[id]?`<div style="font-size:22px;font-weight:400;margin-top:4px">原因：${esc(manualWhy[id])}</div>`:''}<button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('')}
 // ===== 上線／暫停接單 =====
 let ONLINE={open:false,why:'paused'},manualWhy={};
@@ -264,9 +268,9 @@ async function act(id,st){ack(id);const o=find(id);if(!o)return;const lab=st;if(
  busy[id]=1;render(data);
  api({action:'set',id,status:st}).then(r=>{const say={'已接單':'收到，請於 '+o.pickup+' 取餐。下次訂餐直接點👉 https://yzsueuudpwos-lab.github.io/lianyuan/','售完':'今天已售完，抱歉','取消':'訂單已取消','不同意取消':'店家已開始製作，無法取消，有問題請來電'}[st];
  if(r.manual){manualMsg[id]=`${o.name}（編號 ${id}）→ 回「${say}」`;manualWhy[id]=why(r.reply);ding()}else delete manualMsg[id];
- toast(r.manual?'請手動在 LINE 回覆客人':({'取消':lab=='同意取消'?'已同意取消':'取消','不同意取消':'已回覆客人：不能取消'}[st]||st)+'，已自動回覆 LINE ✅');delete busy[id];poll();quota.t=0})
+ toast(r.manual?'請手動在 LINE 回覆客人':({'取消':lab=='同意取消'?'已同意取消':'取消','不同意取消':'已回覆客人：不能取消'}[st]||st)+'，已自動回覆 LINE ✅');delete busy[id];if(st=='已接單')stg(id,'making').catch(()=>{});poll();quota.t=0})
  .catch(e=>{delete busy[id];render(data);say('請再按一次：'+e)})}
-function reprint(id){const o=find(id);if(o)printOrder(o)}
+function reprint(id){const o=find(id);if(o){printOrder(o);onPrinted(id)}}
 // ---- 標籤（與 print.html 相同版面）----
 function labelsOf(o){let it=parseItems(o.items);if($('skip').checked)it=it.filter(i=>!SIDE.includes(i.n));const L=[];
  it.forEach(i=>{for(let k=0;k<i.q;k++)L.push({name:o.name,phone:String(o.phone||'').replace(/\D/g,''),time:o.pickup,note:o.note,item:i.n})});
@@ -381,4 +385,11 @@ if(PIN){$('pin').style.display='none';start();unlockAudio()}else $('pin').style.
 // 📱 手機版／💻 平板版：第一次依螢幕寬度自動選，之後記住
 function setView(p,save){document.body.classList.toggle('phone',p);const b=document.getElementById('viewBtn');if(b)b.innerHTML=p?'<u>📱 手機版</u> / 💻 平板版':'📱 手機版 / <u>💻 平板版</u>';if(save!==false)localStorage.ly_view=p?'phone':'tablet'}
 setView(localStorage.ly_view?localStorage.ly_view==='phone':Math.min(screen.width,innerWidth)<600,false);
+// 即時店況：做好了／已取貨（只改階段，不發 LINE）
+function stg(id,sg){return api({action:'stage',id,stage:sg}).then(()=>poll())}
+// 一顆按鈕輪流：做好了 → 已取貨（之後就完成，不再變）
+function stgNext(id){const o=find(id);if(!o)return;const nx=o.stage=='ready'?'picked':'ready';o.stage=nx;render(data);stg(id,nx).catch(e=>say('請再按一次：'+e))}
+// 列印掛勾：印單＝開始做（吉祥物走進廚房）；已經做好／取貨的不會倒退
+function onPrinted(id){const o=find(id);if(o&&o.status=='已接單'&&!o.stage)stg(id,'making').catch(()=>{})}
+function slotTxt(p){const m=String(p||'').match(/\d{1,2}:\d{2}/);return m?m[0]:''}
 </script></body></html>

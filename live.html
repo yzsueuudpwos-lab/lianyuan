@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>蓮緣素食・店裡即時狀況</title><meta name="robots" content="noindex"><link rel="icon" href="icon.png"><style>
+*{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden}
+body{font-family:"Noto Sans CJK TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#2f3a2a;color:#4a3b2a;display:flex;flex-direction:column}
+.hud{display:flex;gap:6px;align-items:center;background:linear-gradient(#5d8c43,#4c7637);color:#fff;padding:6px 10px;border-bottom:3px solid #2f4a22;overflow:hidden}
+.hud .t{font-weight:900;font-size:17px;margin-right:4px;white-space:nowrap}
+.cnt{background:#0003;border:1px solid #fff5;border-radius:10px;padding:2px 9px;font-size:13px;white-space:nowrap}.cnt b{font-size:16px;margin-left:3px}
+.clock{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700;background:#0004;border-radius:10px;padding:2px 10px;white-space:nowrap}
+.main{flex:1;display:flex;min-height:0}
+.stage{flex:1;position:relative;overflow:hidden;background:#3b4a33}
+#world{position:absolute;left:0;top:0;width:1000px;height:620px;transform-origin:0 0;background:repeating-conic-gradient(#f6e7c8 0 25%,#efdcb6 0 50%) 0 0/40px 40px;border-radius:14px;box-shadow:inset 0 0 0 8px #a8764a}
+.area{position:absolute;border-radius:14px}
+.kitchen{left:20px;top:20px;width:690px;height:230px;background:repeating-linear-gradient(45deg,#dfeee0 0 20px,#d4e7d6 20px 40px);border:4px solid #8fb58a}
+.restz{left:725px;top:20px;width:255px;height:230px;background:#e9e2f5;border:4px solid #b2a6d6}
+.seats{left:120px;top:480px;width:560px;height:100px;background:#fff8e6;border:3px dashed #d9b67c}
+.lbl{position:absolute;font-weight:900;font-size:15px;color:#6b4e2e;background:#fffc;padding:1px 8px;border-radius:8px}
+.counter{position:absolute;left:150px;top:318px;width:500px;height:34px;background:#b5763c;border-radius:8px;border-top:8px solid #d79a5c;box-shadow:0 4px 0 #7d4f25}
+.shelf{position:absolute;left:705px;top:318px;width:270px;height:34px;background:#8d6a4a;border-radius:8px;border-top:8px solid #c29a6e;box-shadow:0 4px 0 #5b4127}
+.door{position:absolute;left:420px;top:596px;width:160px;height:24px;background:#7ab0d8;border-radius:10px 10px 0 0}
+.stn{position:absolute;top:175px;width:92px;height:52px;background:#9aa3a8;border-radius:8px;border-top:8px solid #6c757a}
+.wok{position:absolute;left:12px;top:-14px;width:40px;height:17px;background:#333;border-radius:0 0 30px 30px}
+.pot{position:absolute;right:4px;top:-22px;font-size:22px}
+.busy .wok{animation:toss .5s infinite alternate}@keyframes toss{to{transform:translateY(-7px) rotate(-10deg)}}
+.stm{position:absolute;left:24px;top:-20px;width:14px;height:14px;border-radius:50%;background:#fff;opacity:0}
+.busy .stm{animation:steam 1.4s infinite}.busy .stm+.stm{animation-delay:.7s;left:38px}
+@keyframes steam{0%{opacity:.95;transform:translateY(0) scale(.6)}100%{opacity:0;transform:translateY(-50px) scale(1.9)}}
+.deco{position:absolute;font-size:26px}
+.ag{position:absolute;width:0;height:0;cursor:pointer}
+.ag .hit{position:absolute;left:-30px;top:-66px;width:60px;height:72px}
+.ag .body{position:absolute;left:-28px;top:-62px;width:56px;height:62px;background-size:contain;background-repeat:no-repeat;background-position:bottom center;pointer-events:none}
+.ag.walk .body{animation:walk .22s infinite alternate}@keyframes walk{from{transform:rotate(-7deg)}to{transform:rotate(7deg) translateY(-5px)}}
+.ag.nap .body{filter:saturate(.75);animation:breathe 1.6s infinite alternate}@keyframes breathe{to{transform:scaleY(.94)}}
+.ag .sh{position:absolute;left:-22px;top:-8px;width:44px;height:14px;border-radius:50%;background:#0002}
+.ag .ring{position:absolute;left:-34px;top:-16px;width:68px;height:28px;border-radius:50%;border:3px solid #39e06b;box-shadow:0 0 10px #39e06b;display:none;animation:spin 1s infinite alternate}
+@keyframes spin{to{transform:scale(1.12)}}.ag.sel .ring{display:block}
+.ag.mine .sh{background:#ffd54a88;box-shadow:0 0 18px 6px #ffd54a}
+.ag .carry{position:absolute;left:10px;top:-36px;font-size:22px;pointer-events:none}
+.tag{position:absolute;left:0;top:-68px;transform:translate(calc(-50% + var(--dx,0px)),calc(-100% + var(--dy,0px))) scale(var(--ls,1));transform-origin:50% 100%;background:#fffffff2;border:2px solid #4c7637;border-radius:8px;padding:1px 5px 3px;font-size:12px;font-weight:800;white-space:nowrap;text-align:center;min-width:60px;line-height:1.25;pointer-events:none;transition:--dy .2s}
+.tag .pb{height:5px;background:#e3d8c3;border-radius:3px;margin-top:2px;overflow:hidden}.tag .pb i{display:block;height:100%}
+.tag.idle{border-color:#9b8fc4;min-width:0;color:#7a6fa6;padding:0 4px}.tag.wt{border-color:#e0a800;background:#fff6c9}
+.tag.mine{border-color:#e0a800;background:#fff1b0;box-shadow:0 0 10px #ffc400;font-size:13px}.tag .me{display:block;color:#c0602a;font-size:12px}
+.cust{position:absolute;width:0;height:0;pointer-events:none}.cust span{position:absolute;left:-17px;top:-40px;font-size:32px;white-space:nowrap}
+.cust.walk span{animation:walk .25s infinite alternate}
+.cust .ct{position:absolute;left:0;top:2px;transform:translateX(-50%) scale(var(--ls,1));transform-origin:50% 0;font-size:11px;background:#fff;border-radius:6px;padding:0 4px;white-space:nowrap;color:#a05a2a;font-weight:700}
+.cust.mine .ct{background:#ffd54a;color:#5a3a00}.cust .crown{position:absolute;left:-10px;top:-62px;font-size:20px}
+.side{width:250px;background:#fdf6e9;border-left:3px solid #2f4a22;display:flex;flex-direction:column;padding:8px;gap:8px;overflow:hidden}
+.side h4{font-size:14px;color:#4c7637}
+.my{background:#fff8d6;border:3px solid #e0a800;border-radius:12px;padding:8px 10px}
+.my .no{font-size:17px;font-weight:900;color:#c0602a}.my .sl{font-size:13px}
+.my .est{display:inline-block;background:#ffe9a8;color:#8a5a00;border:1px solid #e0a800;border-radius:8px;font-size:11px;font-weight:800;padding:0 5px;margin-right:3px}
+.my .got{display:block;width:100%;margin-top:7px;min-height:46px;border:0;border-radius:12px;background:#4c9e3a;color:#fff;font-size:18px;font-weight:900;font-family:inherit}
+.my .ph{display:flex;gap:5px;margin-top:6px;align-items:center;font-size:12px}.my .ph input{width:64px;font-size:18px;padding:4px;border:2px solid #e0a800;border-radius:8px;text-align:center}.my .ph button{flex:1;min-height:40px;border:0;border-radius:10px;background:#4c9e3a;color:#fff;font-weight:800;font-family:inherit;font-size:15px}
+.my .gm{font-size:12px;color:#c0392b;margin-top:3px}
+.steps{display:flex;justify-content:space-between;margin-top:6px}.steps span{font-size:11px;color:#b3a48c;text-align:center;flex:1}.steps span.on{color:#4c7637;font-weight:800}
+.steps span i{display:block;font-style:normal;font-size:16px;filter:grayscale(1);opacity:.5}.steps span.on i{filter:none;opacity:1}
+.q{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.qi{background:#fff;border-radius:8px;padding:4px 7px;font-size:12px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid #ccc}
+.qi b{font-size:13px}.qi.me{background:#fff1b0}.s0{border-color:#e07a2e}.s1{border-color:#f2b72e}.s2{border-color:#4c9e3a}
+.card{background:#fff;border-radius:12px;padding:8px 10px;border:3px solid #39e06b;font-size:13px;display:none}.card.show{display:block}
+.card h5{font-size:15px;color:#c0602a}.card .x{float:right;cursor:pointer;font-size:16px}
+.note{font-size:11px;color:#8a7760}
+.net{position:absolute;left:10px;bottom:8px;font-size:12px;color:#fff;background:#0007;border-radius:8px;padding:2px 8px;display:none}.net.show{display:block}
+.pause{position:absolute;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:2000}.pause.show{display:flex}
+.pause button{font:inherit;font-size:18px;font-weight:800;background:#fff;border:0;border-radius:14px;padding:14px 22px;color:#4c7637}
+.rot{display:none}
+@media(max-width:900px){.side{width:175px;padding:5px;gap:5px}.hud .t{font-size:14px}.cnt{font-size:11px;padding:1px 6px}.cnt b{font-size:13px}.qi{font-size:11px;padding:2px 5px}.side h4{font-size:12px}.my .no{font-size:14px}.my{padding:5px 7px}.hud .cnt.opt{display:none}}
+@media(max-width:600px) and (orientation:portrait){.main{flex-direction:column}.side{width:auto;border-left:0;border-top:3px solid #2f4a22;flex:0 0 auto;max-height:46%}.stage{flex:0 0 auto;height:calc(100vw * .62)}
+ .rot{display:block;text-align:center;color:#fff;font-size:12px;padding:3px;background:#2f4a22}.hud .cnt{display:none}.hud .cnt.k{display:inline-block}.my .no{font-size:18px}.steps span{font-size:12px}}
+</style></head><body>
+<div class="hud"><span class="t">🪷 蓮緣 店裡即時狀況</span>
+<span class="cnt k">今日訂單<b id="c0">–</b></span><span class="cnt opt">🛎️櫃檯<b id="c1">0</b></span><span class="cnt opt">🍳製作中<b id="c2">0</b></span><span class="cnt opt">🍱待取<b id="c3">0</b></span><span class="cnt opt">💤閒置<b id="c4">0</b></span>
+<span class="clock" id="clk">--:--</span></div>
+<div class="rot">📱 把手機橫過來看更清楚</div>
+<div class="main"><div class="stage" id="stage"><div id="world">
+ <div class="area kitchen"></div><div class="lbl" style="left:34px;top:28px">🔥 廚房</div>
+ <div class="area restz"></div><div class="lbl" style="left:740px;top:28px">☕ 休息區</div>
+ <div class="area seats"></div><div class="lbl" style="left:22px;top:480px">🪑 等候區</div>
+ <div class="counter"></div><div class="lbl" style="left:20px;top:324px">🛎️ 櫃檯</div>
+ <div class="shelf"></div><div class="lbl" style="left:715px;top:362px">🍱 取餐架</div>
+ <div class="door"></div><div class="lbl" style="left:462px;top:572px">🚪 入口</div>
+ <div class="deco" style="left:40px;top:66px">🥬🥕</div><div class="deco" style="left:600px;top:62px">🍚🍚</div>
+ <div class="deco" style="left:930px;top:200px">🪴</div><div class="deco" style="left:40px;top:540px">🪴</div>
+ <div id="layer"></div></div><div class="net" id="net"></div>
+ <div class="pause" id="pause"><button onclick="resume()">⏸ 已暫停更新，點我繼續看 🥦</button></div></div>
+<div class="side"><div class="my" id="my" style="display:none"></div><div class="card" id="card"></div><h4>📋 今天的訂單</h4><div class="q" id="q"></div>
+<div class="note">吉祥物代表訂單（一張單一隻），不是真正的店員。只顯示訂單編號。</div></div></div>
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec';
+const QS=new URLSearchParams(location.search),MY=(QS.get('order')||'').slice(0,20),DEMO=QS.get('demo');
+const W=document.getElementById('world'),L=document.getElementById('layer'),$=id=>document.getElementById(id);
+const IMG=['m/cabbage.png','m/carrot.png','m/tofu.png'],NM=['小高麗菜','小紅蘿蔔','小豆腐'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+// ---- 場景座標
+const SL={counter:[190,295,400,505,610].map(x=>[x,300]),kitchen:[84,192,300,408,516,624].map(x=>[x,168]),shelf:[745,815,885,955].map(x=>[x,300]),
+ rest:[[770,150],[850,150],[930,150],[790,242],[880,242],[960,242],[820,196],[910,196],[750,196],[960,150]]};
+const SEAT=[170,240,310,380,450,520,590,650].map(x=>[x,555]),DOOR=[500,650];
+SL.kitchen.forEach(([x],i)=>{const d=document.createElement('div');d.className='stn';d.id='stn'+i;d.style.left=(x-46)+'px';d.innerHTML='<div class="wok"></div><div class="stm"></div><div class="stm"></div><div class="pot">🍚</div>';W.insertBefore(d,L)});
+const CU=['🧑','👩','👴','👧','🧔','👵','👨‍💼','👩‍🦰','👦','🧓'];
+const used={counter:[],kitchen:[],shelf:[],rest:[],seat:[]};
+function claim(z){const a=z=='seat'?SEAT:SL[z];for(let i=0;i<a.length;i++)if(!used[z][i]){used[z][i]=1;return i}return a.length-1}
+function free(z,i){if(i!=null&&i>=0)used[z][i]=0}
+function mk(c,h){const e=document.createElement('div');e.className=c;e.innerHTML=h;L.appendChild(e);return e}
+const staff=[];let sel=null;
+for(let i=0;i<10;i++){const k=i%3,e=mk('ag','<div class="ring"></div><div class="sh"></div><div class="body" style="background-image:url('+IMG[k]+')"></div><div class="carry"></div><div class="tag"></div><div class="hit"></div>');
+ const s={i,k,e,name:NM[k]+(Math.floor(i/3)+1),o:null,zone:'rest',slot:claim('rest'),x:0,y:0,sp:170,act:'idle'};[s.x,s.y]=SL.rest[s.slot];s.tx=s.x;s.ty=s.y;
+ e.querySelector('.hit').onclick=ev=>{ev.stopPropagation();sel=s;showCard()};staff.push(s)}
+// ---- 訂單
+const OR=new Map();let first=true,TODAY=0,OVER=0;
+const RANK={ready:0,kitchen:1,counter:2};
+function apply(d){TODAY=d.today||0;const seen=new Set();
+ (d.orders||[]).forEach(r=>{seen.add(r.no);let o=OR.get(r.no);if(!o){o={no:r.no,stage:r.stage,slot:r.slot,t0:Date.now(),ts:Date.now(),s:null,c:null};OR.set(r.no,o)}else if(o.stage!=r.stage){o.stage=r.stage;o.ts=Date.now()}o.slot=r.slot;o.auto=!!r.auto});
+ // 想要有吉祥物的：自己的單優先，其次 待取 > 製作 > 櫃檯
+ const act=[...OR.values()].filter(o=>RANK[o.stage]!=null).sort((a,b)=>(b.no==MY)-(a.no==MY)||RANK[a.stage]-RANK[b.stage]||(a.no<b.no?-1:1));
+ const keep=new Set(act.slice(0,10));OVER=Math.max(0,act.length-10);
+ // 已有吉祥物但被擠掉的（很少見）→ 放回休息
+ staff.forEach(s=>{if(s.o&&RANK[s.o.stage]!=null&&!keep.has(s.o)){release(s)}});
+ act.slice(0,10).forEach(o=>{if(!o.s){const s=staff.find(x=>!x.o&&x.act=='idle')||staff.find(x=>!x.o);if(!s)return;s.o=o;o.s=s;
+   o.c=spawnCust(o,first||o.stage!='counter');}
+  place(o,first)});
+ // 結束的單：done → 客人來拿；cancelled → 客人離開
+ OR.forEach(o=>{if(o.s&&(o.stage=='done'||o.stage=='cancelled'))finish(o,first)});
+ first=false;render()}
+function spawnCust(o,inside){const mine=o.no==MY,e=mk('cust'+(mine?' mine':''),(mine?'<div class="crown">👑</div>':'')+'<span>'+CU[parseInt(o.no.slice(-3))%CU.length||0]+'</span><div class="ct">'+(mine?'你 ':'')+'#'+esc(short(o.no))+'</div>');
+ const c={e,x:DOOR[0],y:DOOR[1],tx:DOOR[0],ty:DOOR[1],sp:120,seat:null,st:'in'};return c}
+function short(no){return String(no).split('-').pop()}
+function setZone(s,z,jump){if(s.zone==z)return;free(s.zone,s.slot);s.zone=z;s.slot=claim(z);goto(s,SL[z][s.slot],jump)}
+function goto(a,p,jump){a.tx=p[0];a.ty=p[1];if(jump){a.x=a.tx;a.y=a.ty}}
+function place(o,jump){const s=o.s,c=o.c;
+ if(o.stage=='counter'){setZone(s,'counter',jump);s.act='taking';const p=SL.counter[s.slot];c.free&&c.free();free('seat',c.seat);c.seat=null;goto(c,[p[0],445],jump)}
+ else{setZone(s,o.stage=='ready'?'shelf':'kitchen',jump);s.act=o.stage=='ready'?'waiting':'cooking';if(c.seat==null){c.seat=claim('seat');goto(c,SEAT[c.seat],jump)}}}
+function finish(o,jump){const s=o.s,c=o.c;if(o.fin)return;o.fin=1;free('seat',c.seat);
+ if(o.stage=='done'){if(s.zone!='shelf'){setZone(s,'shelf',jump)}s.act='waiting';const p=SL.shelf[s.slot];c.st='pick';goto(c,[p[0],445])}
+ else{c.st='leave';goto(c,DOOR);release(s)}}
+function release(s){const o=s.o;if(o){o.s=null}s.o=null;s.act='toRest';setZone(s,'rest')}
+function move(a,dt){const dx=a.tx-a.x,dy=a.ty-a.y,d=Math.hypot(dx,dy),v=a.sp*dt;if(d<=v||d<.01){a.x=a.tx;a.y=a.ty;return true}a.x+=dx/d*v;a.y+=dy/d*v;return false}
+const custs=()=>[...OR.values()].filter(o=>o.c&&!o.c.dead).map(o=>o);
+function step(dt){
+ staff.forEach(s=>{if(move(s,dt)&&s.act=='toRest')s.act='idle'});
+ custs().forEach(o=>{const c=o.c,arr=move(c,dt);
+  if(c.st=='pick'&&arr){c.st='leave';c.e.querySelector('span').textContent+='🍱';if(o.s)release(o.s);setTimeout(()=>goto(c,DOOR),600)}
+  else if(c.st=='leave'&&arr&&c.x==DOOR[0]&&c.y==DOOR[1]){c.e.remove();c.dead=1}})}
+const ICON={taking:'📝',cooking:'🍳',waiting:'⏳'},TXT={taking:'櫃檯點餐中',cooking:'廚房製作中',waiting:'便當好了，等待取餐',idle:'休息中',toRest:'回休息區'};
+const SC={counter:0,kitchen:1,ready:2};
+function prog(o){const t=(Date.now()-o.ts)/1000;return o.stage=='ready'||o.stage=='done'?1:o.stage=='kitchen'?Math.min(.95,.15+t/300):Math.min(.9,.2+t/120)}
+let LS=1;
+function render(){
+ staff.forEach(s=>{const e=s.e,o=s.o,mine=o&&o.no==MY;e.style.left=s.x+'px';e.style.top=s.y+'px';e.style.zIndex=Math.round(s.y)+(mine?1000:0);
+  e.classList.toggle('walk',s.x!=s.tx||s.y!=s.ty);e.classList.toggle('nap',s.act=='idle');e.classList.toggle('sel',sel===s);e.classList.toggle('mine',!!mine);
+  const tg=e.querySelector('.tag');
+  if(!o){tg.className='tag idle';tg.textContent=s.act=='idle'?(s.i%2?'🍵':'💤'):'☕'}
+  else{const p=prog(o),col=o.stage=='counter'?'#e07a2e':o.stage=='kitchen'?'#f29a2e':'#4c9e3a';tg.className='tag'+(mine?' mine':s.act=='waiting'?' wt':'');
+   tg.innerHTML=(mine?'<span class="me">👑 你的便當</span>':'')+(ICON[s.act]||'🏃')+' #'+esc(short(o.no))+'<div class="pb"><i style="width:'+Math.round(p*100)+'%;background:'+col+'"></i></div>'}
+  e.querySelector('.carry').textContent=s.act=='waiting'?'🍱':s.act=='taking'?'🧾':''});
+ custs().forEach(o=>{const c=o.c;c.e.style.left=c.x+'px';c.e.style.top=c.y+'px';c.e.style.zIndex=Math.round(c.y)+(o.no==MY?1000:0);c.e.classList.toggle('walk',c.x!=c.tx||c.y!=c.ty)});
+ SL.kitchen.forEach((_,i)=>$('stn'+i).classList.toggle('busy',staff.some(s=>s.act=='cooking'&&s.zone=='kitchen'&&s.slot==i&&s.x==s.tx)));
+ declutter();
+ const all=[...OR.values()],n=st=>all.filter(o=>o.stage==st).length;
+ $('c0').textContent=TODAY;$('c1').textContent=n('counter');$('c2').textContent=n('kitchen');$('c3').textContent=n('ready');$('c4').textContent=staff.filter(s=>!s.o).length;
+ const SN=['點餐','製作中','待取'];
+ $('q').innerHTML=all.filter(o=>SC[o.stage]!=null).sort((a,b)=>(b.no==MY)-(a.no==MY)||SC[b.stage]-SC[a.stage]).slice(0,12).map(o=>'<div class="qi s'+SC[o.stage]+(o.no==MY?' me':'')+'"><span>'+(o.no==MY?'👑 ':'')+'<b>#'+esc(short(o.no))+'</b> '+(o.slot?esc(o.slot)+' 取':'')+'</span><span>'+SN[SC[o.stage]]+'</span></div>').join('')+(OVER?'<div class="qi">還有 '+OVER+' 張排隊中</div>':'')||'<div class="note">目前沒有進行中的訂單 🍵</div>';
+ myCard();if(sel)showCard()}
+// 標籤不重疊：由下往上排，撞到就往上推
+function declutter(){const R=[];const tags=staff.map(s=>({s,t:s.e.querySelector('.tag')})).sort((a,b)=>b.s.y-a.s.y);
+ tags.forEach(({s,t})=>{const w=t.offsetWidth*LS,h=t.offsetHeight*LS;let y=s.y-68,dy=0,dx=0;if(s.x-w/2<14)dx=14-(s.x-w/2);else if(s.x+w/2>986)dx=986-(s.x+w/2);const x=s.x+dx;
+  for(let k=0;k<12;k++){const hit=R.find(r=>Math.abs(r.x-x)<(r.w+w)/2+2&&(y-h+dy)<r.y&&(y+dy)>r.y-r.h);if(!hit)break;dy=(hit.y-r0(hit))-y-2}
+  R.push({x,w,h,y:y+dy});t.style.setProperty('--dy',(dy/LS)+'px');t.style.setProperty('--dx',(dx/LS)+'px')});
+ function r0(r){return r.h}}
+const STEP=[['🧾','已送出'],['🍳','製作中'],['🍱','可取餐'],['🙇','完成']];
+const TK=(QS.get('t')||'').slice(0,60);let GOT=localStorage.getItem('ly_got')==MY&&MY,gMsg='',myKey='',askPh=false;
+function myCard(){if(!MY){$('my').style.display='none';return}const o=OR.get(MY),m=$('my');m.style.display='block';let h;
+ if(!o)h='<div class="no">👑 你的訂單 #'+esc(short(MY))+'</div><div class="sl">'+(first?'讀取中…':'還沒在今天的單裡找到，稍後會自動更新')+'</div>';
+ else if(o.stage=='cancelled')h='<div class="no">#'+esc(short(MY))+'</div><div class="sl">這張訂單已取消</div>';
+ else{const done=GOT||(o.stage=='done'&&!o.auto),k=done?3:{counter:0,kitchen:1,ready:2,done:3}[o.stage],est=o.auto&&!done?'<span class="est">預計</span>':'';
+  h='<div class="no">👑 你的便當 #'+esc(short(MY))+'</div><div class="sl">'+est+['店家確認中','廚房製作中','好了！到櫃檯取餐 🎉','取餐完成，謝謝光臨 🙏'][k]+(o.slot?'・'+esc(o.slot)+' 取餐':'')+'</div><div class="steps">'+STEP.map((x,i)=>'<span class="'+(i<=k?'on':'')+'"><i>'+x[0]+'</i>'+(i==k&&est?'預計':'')+x[1]+'</span>').join('')+'</div>';
+  if(!done&&o.stage!='counter')h+=askPh?'<div class="ph">電話末三碼<input id="ph3" inputmode="numeric" maxlength="3" autocomplete="off"><button onclick="gotIt()">確認</button></div>':'<button class="got" onclick="gotIt()">我拿到了 👍</button>';
+  if(gMsg)h+='<div class="gm">'+esc(gMsg)+'</div>'}
+ if(h!==myKey){myKey=h;m.innerHTML=h}}
+// 客人自己按「我拿到了」：有隨機碼（訂單完成頁／LINE 連結）就直接送，沒有就請輸入電話末三碼
+async function gotIt(){let ph='';if(!TK){if(!askPh){askPh=true;myKey='';return}ph=($('ph3')||{}).value||'';if(!/^\d{3}$/.test(ph)){gMsg='請輸入電話最後 3 個數字';myKey='';return}}
+ gMsg='送出中…';myKey='';
+ try{let d;if(DEMO)d={ok:true};else{const r=await fetch(GAS_URL+'?action=gotit&order='+encodeURIComponent(MY)+(TK?'&t='+encodeURIComponent(TK):'&ph='+ph));d=await r.json()}
+  if(d&&d.ok){GOT=MY;localStorage.setItem('ly_got',MY);gMsg='';const o=OR.get(MY);if(o){o.stage='done';o.auto=false;o.ts=Date.now()}stopped=true}
+  else gMsg=d&&d.error=='status'?'店家還沒接單，先等一下喔':'對不上，請再確認電話末三碼'}
+ catch(e){gMsg='連線不穩，請再按一次'}myKey=''}
+function showCard(){const s=sel,o=s.o,c=$('card');c.className='card show';
+ c.innerHTML='<span class="x" onclick="sel=null;card.className=\'card\'">✕</span><h5>'+s.name+'</h5>'+(o?'<div>訂單 <b>#'+esc(o.no)+'</b>'+(o.no==MY?'（你的）':'')+'</div><div>'+TXT[s.act]+'</div>'+(o.slot?'<div>取餐 '+esc(o.slot)+'</div>':''):'<div>'+TXT[s.act]+'，等待新訂單</div>')}
+document.addEventListener('click',()=>{});
+function fit(){const st=$('stage'),sc=Math.min(st.clientWidth/1000,st.clientHeight/620);W.style.transform='scale('+sc+')';W.style.left=(st.clientWidth-1000*sc)/2+'px';W.style.top=(st.clientHeight-620*sc)/2+'px';LS=Math.min(1.8,Math.max(1,.72/sc));W.style.setProperty('--ls',LS)}
+addEventListener('resize',fit);fit();
+function tick(){const d=new Date(Date.now()+8*3600e3);$('clk').textContent=d.toISOString().slice(11,16)}tick();setInterval(tick,10000);
+let last=performance.now();function loop(t){step(Math.max(0,Math.min(.05,(t-last)/1000)));last=t;render();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+// ---- 讀資料：每 20 秒；畫面看不到就停；自己的單完成/取消就停；30 分鐘沒動作就停；失敗就退避重試，動畫照跑
+const POLL=20000,IDLE_MAX=30*60e3;let timer=null,fails=0,stopped=false,lastAct=Date.now(),busyF=false;
+['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now()},{passive:true}));
+function sched(ms){clearTimeout(timer);if(!stopped&&!document.hidden)timer=setTimeout(poll,ms)}
+async function fetchLive(){if(DEMO)return demo();const ac=new AbortController(),t=setTimeout(()=>ac.abort(),8000);
+ try{const r=await fetch(GAS_URL+'?action=live',{signal:ac.signal});const d=await r.json();if(!d||!d.ok)throw 0;return d}finally{clearTimeout(t)}}
+async function poll(){if(stopped||busyF)return;if(Date.now()-lastAct>IDLE_MAX){stop(true);return}busyF=true;
+ try{const d=await fetchLive();fails=0;$('net').className='net';apply(d);
+  const me=MY&&OR.get(MY);if(me&&(me.stage=='done'||me.stage=='cancelled')){stopped=true;return}sched(POLL)}
+ catch(e){fails++;const ms=Math.min(POLL*Math.pow(2,fails),300000);$('net').textContent='⚠ 連線不穩，'+Math.round(ms/1000)+' 秒後再試';$('net').className='net show';sched(ms)}
+ finally{busyF=false}}
+function stop(idle){stopped=true;clearTimeout(timer);if(idle)$('pause').className='pause show'}
+function resume(){$('pause').className='pause';stopped=false;lastAct=Date.now();poll()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(timer);else if(!stopped){lastAct=Date.now();poll()}});
+// ---- 示範資料（?demo=1，不連後端）
+let DS=null;function demo(){const now=Date.now();if(!DS){DS={t:now,n:0,list:[]};const pre=[['counter'],['counter'],['counter'],['kitchen'],['kitchen'],['ready']];pre.forEach(([st])=>DS.list.push({no:'1031-0'+String(++DS.n+10).padStart(2,'0'),stage:st,slot:'12:'+String(10+DS.n*5).padStart(2,'0'),at:now}))}
+ const L2=DS.list;L2.forEach(o=>{const t=(now-o.at)/1000;const nx={counter:['kitchen',8],kitchen:['ready',14],ready:['done',8]}[o.stage];if(nx&&t>nx[1]+Math.random()*4){o.stage=nx[0];o.at=now}});
+ if(L2.filter(o=>o.stage=='counter').length<3&&Math.random()<.7)L2.push({no:'1031-0'+String(++DS.n+10).padStart(2,'0'),stage:'counter',slot:'12:'+String((10+DS.n*5)%60).padStart(2,'0'),at:now});
+ return {ok:true,today:30+DS.n,orders:L2.map(({no,stage,slot})=>({no,stage,slot}))}}
+if(DEMO){const DP=+DEMO>1?+DEMO:3000;setInterval(()=>{if(!stopped)fetchLive().then(apply)},DP)}
+poll();
+</script></body></html>

@@ -251,6 +251,7 @@ function mdl(id,html){const m=document.getElementById(id);document.getElementByI
 function showOk(){mdl('okMdl',`<div style="font-size:48px">✅</div><h3 style="color:#2e7d32">訂單已送出！<br>編號 ${esc(window.SID)}</h3>
  <p>最後一步：按下面綠色按鈕，在 LINE 按「傳送」，店家回覆『收到』才算成功。</p>
  <a class="bb ln" id="goLine" href="${esc(lineUrl(txt()))}">💬 開啟 LINE 傳送訂單</a>
+ <a class="bb" id="goLive" style="background:#fff3c4;color:#5a3a00;border:2px solid #e0a800" href="live.html?order=${encodeURIComponent(window.SID)}${window.CT?'&t='+encodeURIComponent(window.CT):''}" target="_blank" rel="noopener">看店裡即時狀況 🥦</a>
  <button class="bb gy" onclick="cancelFlow(window.SID,window.CT)">取消這張訂單</button><p class="sm">訂錯了？店家接單前按取消會馬上取消；接單後會送出取消申請給店家。</p>`)}
 const CMSG={pending:'店家還沒接單，取消後馬上生效。',accepted:'店家已經接單了，按取消會送「取消申請」給店家，店家同意才算取消。'};
 let CID='',CTK='';async function cancelFlow(id,t){CID=id;CTK=t;mdl('okMdl','');mdl('cMdl','<p>讀取中…</p>');let d;try{d=await gpost({action:'cstatus',id,t})}catch(e){d={}}
