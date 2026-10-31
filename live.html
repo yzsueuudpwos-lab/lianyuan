@@ -50,6 +50,8 @@ body{font-family:"Noto Sans CJK TC","Noto Sans TC","PingFang TC","Microsoft Jhen
 .my .est{display:inline-block;background:#ffe9a8;color:#8a5a00;border:1px solid #e0a800;border-radius:8px;font-size:11px;font-weight:800;padding:0 5px;margin-right:3px}
 .my .got{display:block;width:100%;margin-top:7px;min-height:46px;border:0;border-radius:12px;background:#4c9e3a;color:#fff;font-size:18px;font-weight:900;font-family:inherit}
 .my .ph{display:flex;gap:5px;margin-top:6px;align-items:center;font-size:12px}.my .ph input{width:64px;font-size:18px;padding:4px;border:2px solid #e0a800;border-radius:8px;text-align:center}.my .ph button{flex:1;min-height:40px;border:0;border-radius:10px;background:#4c9e3a;color:#fff;font-weight:800;font-family:inherit;font-size:15px}
+.hint{background:#fff8d6;border:2px dashed #e0a800;border-radius:12px;padding:8px 10px;font-weight:800;color:#8a5a00;font-size:14px}.hint span{display:block;font-weight:400;font-size:12px;color:#6b4e2e;margin-top:3px}
+#my{display:flex;flex-direction:column;gap:6px;overflow:auto;flex:0 1 auto;max-height:60%}#my h4{margin:0}
 .my .gm{font-size:12px;color:#c0392b;margin-top:3px}
 .steps{display:flex;justify-content:space-between;margin-top:6px}.steps span{font-size:11px;color:#b3a48c;text-align:center;flex:1}.steps span.on{color:#4c7637;font-weight:800}
 .steps span i{display:block;font-style:normal;font-size:16px;filter:grayscale(1);opacity:.5}.steps span.on i{filter:none;opacity:1}
@@ -82,11 +84,22 @@ body{font-family:"Noto Sans CJK TC","Noto Sans TC","PingFang TC","Microsoft Jhen
  <div class="deco" style="left:930px;top:200px">🪴</div><div class="deco" style="left:40px;top:540px">🪴</div>
  <div id="layer"></div></div><div class="net" id="net"></div>
  <div class="pause" id="pause"><button onclick="resume()">⏸ 已暫停更新，點我繼續看 🥦</button></div></div>
-<div class="side"><div class="my" id="my" style="display:none"></div><div class="card" id="card"></div><h4>📋 今天的訂單</h4><div class="q" id="q"></div>
+<div class="side"><div id="my" style="display:none"></div><div class="card" id="card"></div><h4>📋 今天的訂單</h4><div class="q" id="q"></div>
 <div class="note">吉祥物代表訂單（一張單一隻），不是真正的店員。只顯示訂單編號。</div></div></div>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec';
+// LINE 認人（LIFF）：在 LINE Developers 建好 LIFF 後把 ID 填這裡；空白＝不用，只靠「這支手機記住的單」
+const LIFF_ID='';
 const QS=new URLSearchParams(location.search),MY=(QS.get('order')||'').slice(0,20),DEMO=QS.get('demo');
+// ---- 我的便當：這支手機記住的單（index.html 下單成功時存）＋網址的 ?order= ＋ LINE 認出來的單
+const TDY=()=>new Date(Date.now()+8*3600e3).toISOString().slice(0,10);
+function loadMine(){let a=[];try{a=JSON.parse(localStorage.getItem('ly_mine')||'[]')}catch(e){}if(!Array.isArray(a))a=[];
+ try{const l=JSON.parse(localStorage.getItem('ly_last')||'null');if(l&&l.id&&!a.some(x=>x.id==l.id))a.push({id:l.id,t:l.t||'',d:TDY()})}catch(e){}
+ const t=TDY();a=a.filter(x=>x&&x.id&&/^[0-9A-Za-z-]{4,20}$/.test(x.id)&&(x.d||'')>=t).slice(-20); // 過了的日子就刪掉
+ try{localStorage.setItem('ly_mine',JSON.stringify(a))}catch(e){}return a.filter(x=>x.d==t)}
+const MINE=new Map();loadMine().forEach(x=>MINE.set(x.id,x.t||''));
+if(MY&&!MINE.has(MY))MINE.set(MY,(QS.get('t')||'').slice(0,60));else if(MY&&QS.get('t'))MINE.set(MY,QS.get('t').slice(0,60));
+const ME=no=>MINE.has(no);
 const W=document.getElementById('world'),L=document.getElementById('layer'),$=id=>document.getElementById(id);
 const IMG=['m/cabbage.png','m/carrot.png','m/tofu.png'],NM=['小高麗菜','小紅蘿蔔','小豆腐'];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
@@ -110,7 +123,7 @@ const RANK={ready:0,kitchen:1,counter:2};
 function apply(d){TODAY=d.today||0;const seen=new Set();
  (d.orders||[]).forEach(r=>{seen.add(r.no);let o=OR.get(r.no);if(!o){o={no:r.no,stage:r.stage,slot:r.slot,t0:Date.now(),ts:Date.now(),s:null,c:null};OR.set(r.no,o)}else if(o.stage!=r.stage){o.stage=r.stage;o.ts=Date.now()}o.slot=r.slot;o.auto=!!r.auto});
  // 想要有吉祥物的：自己的單優先，其次 待取 > 製作 > 櫃檯
- const act=[...OR.values()].filter(o=>RANK[o.stage]!=null).sort((a,b)=>(b.no==MY)-(a.no==MY)||RANK[a.stage]-RANK[b.stage]||(a.no<b.no?-1:1));
+ const act=[...OR.values()].filter(o=>RANK[o.stage]!=null).sort((a,b)=>ME(b.no)-ME(a.no)||RANK[a.stage]-RANK[b.stage]||(a.no<b.no?-1:1));
  const keep=new Set(act.slice(0,10));OVER=Math.max(0,act.length-10);
  // 已有吉祥物但被擠掉的（很少見）→ 放回休息
  staff.forEach(s=>{if(s.o&&RANK[s.o.stage]!=null&&!keep.has(s.o)){release(s)}});
@@ -120,7 +133,7 @@ function apply(d){TODAY=d.today||0;const seen=new Set();
  // 結束的單：done → 客人來拿；cancelled → 客人離開
  OR.forEach(o=>{if(o.s&&(o.stage=='done'||o.stage=='cancelled'))finish(o,first)});
  first=false;render()}
-function spawnCust(o,inside){const mine=o.no==MY,e=mk('cust'+(mine?' mine':''),(mine?'<div class="crown">👑</div>':'')+'<span>'+CU[parseInt(o.no.slice(-3))%CU.length||0]+'</span><div class="ct">'+(mine?'你 ':'')+'#'+esc(short(o.no))+'</div>');
+function spawnCust(o,inside){const mine=ME(o.no),e=mk('cust'+(mine?' mine':''),(mine?'<div class="crown">👑</div>':'')+'<span>'+CU[parseInt(o.no.slice(-3))%CU.length||0]+'</span><div class="ct">'+(mine?'你 ':'')+'#'+esc(short(o.no))+'</div>');
  const c={e,x:DOOR[0],y:DOOR[1],tx:DOOR[0],ty:DOOR[1],sp:120,seat:null,st:'in'};return c}
 function short(no){return String(no).split('-').pop()}
 function setZone(s,z,jump){if(s.zone==z)return;free(s.zone,s.slot);s.zone=z;s.slot=claim(z);goto(s,SL[z][s.slot],jump)}
@@ -144,20 +157,20 @@ const SC={counter:0,kitchen:1,ready:2};
 function prog(o){const t=(Date.now()-o.ts)/1000;return o.stage=='ready'||o.stage=='done'?1:o.stage=='kitchen'?Math.min(.95,.15+t/300):Math.min(.9,.2+t/120)}
 let LS=1;
 function render(){
- staff.forEach(s=>{const e=s.e,o=s.o,mine=o&&o.no==MY;e.style.left=s.x+'px';e.style.top=s.y+'px';e.style.zIndex=Math.round(s.y)+(mine?1000:0);
+ staff.forEach(s=>{const e=s.e,o=s.o,mine=o&&ME(o.no);e.style.left=s.x+'px';e.style.top=s.y+'px';e.style.zIndex=Math.round(s.y)+(mine?1000:0);
   e.classList.toggle('walk',s.x!=s.tx||s.y!=s.ty);e.classList.toggle('nap',s.act=='idle');e.classList.toggle('sel',sel===s);e.classList.toggle('mine',!!mine);
   const tg=e.querySelector('.tag');
   if(!o){tg.className='tag idle';tg.textContent=s.act=='idle'?(s.i%2?'🍵':'💤'):'☕'}
   else{const p=prog(o),col=o.stage=='counter'?'#e07a2e':o.stage=='kitchen'?'#f29a2e':'#4c9e3a';tg.className='tag'+(mine?' mine':s.act=='waiting'?' wt':'');
    tg.innerHTML=(mine?'<span class="me">👑 你的便當</span>':'')+(ICON[s.act]||'🏃')+' #'+esc(short(o.no))+'<div class="pb"><i style="width:'+Math.round(p*100)+'%;background:'+col+'"></i></div>'}
   e.querySelector('.carry').textContent=s.act=='waiting'?'🍱':s.act=='taking'?'🧾':''});
- custs().forEach(o=>{const c=o.c;c.e.style.left=c.x+'px';c.e.style.top=c.y+'px';c.e.style.zIndex=Math.round(c.y)+(o.no==MY?1000:0);c.e.classList.toggle('walk',c.x!=c.tx||c.y!=c.ty)});
+ custs().forEach(o=>{const c=o.c;c.e.style.left=c.x+'px';c.e.style.top=c.y+'px';c.e.style.zIndex=Math.round(c.y)+(ME(o.no)?1000:0);c.e.classList.toggle('walk',c.x!=c.tx||c.y!=c.ty)});
  SL.kitchen.forEach((_,i)=>$('stn'+i).classList.toggle('busy',staff.some(s=>s.act=='cooking'&&s.zone=='kitchen'&&s.slot==i&&s.x==s.tx)));
  declutter();
  const all=[...OR.values()],n=st=>all.filter(o=>o.stage==st).length;
  $('c0').textContent=TODAY;$('c1').textContent=n('counter');$('c2').textContent=n('kitchen');$('c3').textContent=n('ready');$('c4').textContent=staff.filter(s=>!s.o).length;
  const SN=['點餐','製作中','待取'];
- $('q').innerHTML=all.filter(o=>SC[o.stage]!=null).sort((a,b)=>(b.no==MY)-(a.no==MY)||SC[b.stage]-SC[a.stage]).slice(0,12).map(o=>'<div class="qi s'+SC[o.stage]+(o.no==MY?' me':'')+'"><span>'+(o.no==MY?'👑 ':'')+'<b>#'+esc(short(o.no))+'</b> '+(o.slot?esc(o.slot)+' 取':'')+'</span><span>'+SN[SC[o.stage]]+'</span></div>').join('')+(OVER?'<div class="qi">還有 '+OVER+' 張排隊中</div>':'')||'<div class="note">目前沒有進行中的訂單 🍵</div>';
+ $('q').innerHTML=all.filter(o=>SC[o.stage]!=null).sort((a,b)=>ME(b.no)-ME(a.no)||SC[b.stage]-SC[a.stage]).slice(0,12).map(o=>'<div class="qi s'+SC[o.stage]+(ME(o.no)?' me':'')+'"><span>'+(ME(o.no)?'👑 ':'')+'<b>#'+esc(short(o.no))+'</b> '+(o.slot?esc(o.slot)+' 取':'')+'</span><span>'+SN[SC[o.stage]]+'</span></div>').join('')+(OVER?'<div class="qi">還有 '+OVER+' 張排隊中</div>':'')||'<div class="note">目前沒有進行中的訂單 🍵</div>';
  myCard();if(sel)showCard()}
 // 標籤不重疊：由下往上排，撞到就往上推
 function declutter(){const R=[];const tags=staff.map(s=>({s,t:s.e.querySelector('.tag')})).sort((a,b)=>b.s.y-a.s.y);
@@ -166,24 +179,30 @@ function declutter(){const R=[];const tags=staff.map(s=>({s,t:s.e.querySelector(
   R.push({x,w,h,y:y+dy});t.style.setProperty('--dy',(dy/LS)+'px');t.style.setProperty('--dx',(dx/LS)+'px')});
  function r0(r){return r.h}}
 const STEP=[['🧾','已送出'],['🍳','製作中'],['🍱','可取餐'],['🙇','完成']];
-const TK=(QS.get('t')||'').slice(0,60);let GOT=localStorage.getItem('ly_got')==MY&&MY,gMsg='',myKey='',askPh=false;
-function myCard(){if(!MY){$('my').style.display='none';return}const o=OR.get(MY),m=$('my');m.style.display='block';let h;
- if(!o)h='<div class="no">👑 你的訂單 #'+esc(short(MY))+'</div><div class="sl">'+(first?'讀取中…':'還沒在今天的單裡找到，稍後會自動更新')+'</div>';
- else if(o.stage=='cancelled')h='<div class="no">#'+esc(short(MY))+'</div><div class="sl">這張訂單已取消</div>';
- else{const done=GOT||(o.stage=='done'&&!o.auto),k=done?3:{counter:0,kitchen:1,ready:2,done:3}[o.stage],est=o.auto&&!done?'<span class="est">預計</span>':'';
-  h='<div class="no">👑 你的便當 #'+esc(short(MY))+'</div><div class="sl">'+est+['店家確認中','廚房製作中','好了！到櫃檯取餐 🎉','取餐完成，謝謝光臨 🙏'][k]+(o.slot?'・'+esc(o.slot)+' 取餐':'')+'</div><div class="steps">'+STEP.map((x,i)=>'<span class="'+(i<=k?'on':'')+'"><i>'+x[0]+'</i>'+(i==k&&est?'預計':'')+x[1]+'</span>').join('')+'</div>';
-  if(!done&&o.stage!='counter')h+=askPh?'<div class="ph">電話末三碼<input id="ph3" inputmode="numeric" maxlength="3" autocomplete="off"><button onclick="gotIt()">確認</button></div>':'<button class="got" onclick="gotIt()">我拿到了 👍</button>';
-  if(gMsg)h+='<div class="gm">'+esc(gMsg)+'</div>'}
- if(h!==myKey){myKey=h;m.innerHTML=h}}
-// 客人自己按「我拿到了」：有隨機碼（訂單完成頁／LINE 連結）就直接送，沒有就請輸入電話末三碼
-async function gotIt(){let ph='';if(!TK){if(!askPh){askPh=true;myKey='';return}ph=($('ph3')||{}).value||'';if(!/^\d{3}$/.test(ph)){gMsg='請輸入電話最後 3 個數字';myKey='';return}}
- gMsg='送出中…';myKey='';
- try{let d;if(DEMO)d={ok:true};else{const r=await fetch(GAS_URL+'?action=gotit&order='+encodeURIComponent(MY)+(TK?'&t='+encodeURIComponent(TK):'&ph='+ph));d=await r.json()}
-  if(d&&d.ok){GOT=MY;localStorage.setItem('ly_got',MY);gMsg='';const o=OR.get(MY);if(o){o.stage='done';o.auto=false;o.ts=Date.now()}stopped=true}
-  else gMsg=d&&d.error=='status'?'店家還沒接單，先等一下喔':'對不上，請再確認電話末三碼'}
- catch(e){gMsg='連線不穩，請再按一次'}myKey=''}
+let GOTS=[];try{GOTS=JSON.parse(localStorage.getItem('ly_gots')||'[]')}catch(e){}if(!Array.isArray(GOTS))GOTS=[];
+const GM={},ASK={};let myKey='',LINE_ON=false;
+function oneCard(no){const o=OR.get(no),got=GOTS.includes(no);let h;
+ if(!o)h='<div class="no">👑 你的訂單 #'+esc(short(no))+'</div><div class="sl">'+(first?'讀取中…':'還沒在今天的單裡找到，稍後會自動更新')+'</div>';
+ else if(o.stage=='cancelled')h='<div class="no">#'+esc(short(no))+'</div><div class="sl">這張訂單已取消</div>';
+ else{const done=got||(o.stage=='done'&&!o.auto),k=done?3:{counter:0,kitchen:1,ready:2,done:3}[o.stage],est=o.auto&&!done?'<span class="est">預計</span>':'';
+  h='<div class="no">👑 你的便當 #'+esc(short(no))+'</div><div class="sl">'+est+['店家確認中','廚房製作中','好了！到櫃檯取餐 🎉','取餐完成，謝謝光臨 🙏'][k]+(o.slot?'・'+esc(o.slot)+' 取餐':'')+'</div><div class="steps">'+STEP.map((x,i)=>'<span class="'+(i<=k?'on':'')+'"><i>'+x[0]+'</i>'+(i==k&&est?'預計':'')+x[1]+'</span>').join('')+'</div>';
+  if(!done&&o.stage!='counter')h+=ASK[no]?'<div class="ph">電話末三碼<input id="ph_'+esc(no)+'" inputmode="numeric" maxlength="3" autocomplete="off"><button onclick="gotIt(\''+esc(no)+'\')">確認</button></div>':'<button class="got" onclick="gotIt(\''+esc(no)+'\')">我拿到了 👍</button>';
+  if(GM[no])h+='<div class="gm">'+esc(GM[no])+'</div>'}
+ return '<div class="my">'+h+'</div>'}
+function myCard(){const m=$('my');let h;
+ if(MINE.size){const ids=[...MINE.keys()].sort((a,b)=>{const r=o=>{const x=OR.get(o);return !x?1:x.stage=='ready'?0:x.stage=='kitchen'||x.stage=='counter'?1:2};return r(a)-r(b)||(a<b?-1:1)});
+  h=(MINE.size>1?'<h4>👑 你今天的 '+MINE.size+' 張單</h4>':'')+ids.map(oneCard).join('')}
+ else h='<div class="hint">🥦 這支手機今天還沒有訂單<br><span>下單後回到這頁，就會自動出現「你的便當」'+(LIFF_ID&&!LINE_ON?'；在 LINE 裡打開也會自動認出你的單':'')+'</span></div>';
+ if(h!==myKey){myKey=h;m.innerHTML=h}m.style.display='block'}
+// 客人自己按「我拿到了」：有隨機碼（這支手機下的單／LINE 連結）就直接送，沒有就請輸入電話末三碼
+async function gotIt(no){const tk=MINE.get(no)||'';let ph='';if(!tk){if(!ASK[no]){ASK[no]=1;myKey='';return}ph=($('ph_'+no)||{}).value||'';if(!/^\d{3}$/.test(ph)){GM[no]='請輸入電話最後 3 個數字';myKey='';return}}
+ GM[no]='送出中…';myKey='';
+ try{let d;if(DEMO)d={ok:true};else{const r=await fetch(GAS_URL+'?action=gotit&order='+encodeURIComponent(no)+(tk?'&t='+encodeURIComponent(tk):'&ph='+ph));d=await r.json()}
+  if(d&&d.ok){GOTS.push(no);GOTS=GOTS.slice(-20);try{localStorage.setItem('ly_gots',JSON.stringify(GOTS))}catch(e){}GM[no]='';const o=OR.get(no);if(o){o.stage='done';o.auto=false;o.ts=Date.now()}}
+  else GM[no]=d&&d.error=='status'?'店家還沒接單，先等一下喔':'對不上，請再確認電話末三碼'}
+ catch(e){GM[no]='連線不穩，請再按一次'}myKey=''}
 function showCard(){const s=sel,o=s.o,c=$('card');c.className='card show';
- c.innerHTML='<span class="x" onclick="sel=null;card.className=\'card\'">✕</span><h5>'+s.name+'</h5>'+(o?'<div>訂單 <b>#'+esc(o.no)+'</b>'+(o.no==MY?'（你的）':'')+'</div><div>'+TXT[s.act]+'</div>'+(o.slot?'<div>取餐 '+esc(o.slot)+'</div>':''):'<div>'+TXT[s.act]+'，等待新訂單</div>')}
+ c.innerHTML='<span class="x" onclick="sel=null;card.className=\'card\'">✕</span><h5>'+s.name+'</h5>'+(o?'<div>訂單 <b>#'+esc(o.no)+'</b>'+(ME(o.no)?'（你的）':'')+'</div><div>'+TXT[s.act]+'</div>'+(o.slot?'<div>取餐 '+esc(o.slot)+'</div>':''):'<div>'+TXT[s.act]+'，等待新訂單</div>')}
 document.addEventListener('click',()=>{});
 function fit(){const st=$('stage'),sc=Math.min(st.clientWidth/1000,st.clientHeight/620);W.style.transform='scale('+sc+')';W.style.left=(st.clientWidth-1000*sc)/2+'px';W.style.top=(st.clientHeight-620*sc)/2+'px';LS=Math.min(1.8,Math.max(1,.72/sc));W.style.setProperty('--ls',LS)}
 addEventListener('resize',fit);fit();
@@ -197,7 +216,7 @@ async function fetchLive(){if(DEMO)return demo();const ac=new AbortController(),
  try{const r=await fetch(GAS_URL+'?action=live',{signal:ac.signal});const d=await r.json();if(!d||!d.ok)throw 0;return d}finally{clearTimeout(t)}}
 async function poll(){if(stopped||busyF)return;if(Date.now()-lastAct>IDLE_MAX){stop(true);return}busyF=true;
  try{const d=await fetchLive();fails=0;$('net').className='net';apply(d);
-  const me=MY&&OR.get(MY);if(me&&(me.stage=='done'||me.stage=='cancelled')){stopped=true;return}sched(POLL)}
+  if(MINE.size&&[...MINE.keys()].every(n=>{const o=OR.get(n);return GOTS.includes(n)||o&&((o.stage=='done'&&!o.auto)||o.stage=='cancelled')})){stopped=true;return}sched(POLL)}
  catch(e){fails++;const ms=Math.min(POLL*Math.pow(2,fails),300000);$('net').textContent='⚠ 連線不穩，'+Math.round(ms/1000)+' 秒後再試';$('net').className='net show';sched(ms)}
  finally{busyF=false}}
 function stop(idle){stopped=true;clearTimeout(timer);if(idle)$('pause').className='pause show'}
@@ -209,5 +228,14 @@ let DS=null;function demo(){const now=Date.now();if(!DS){DS={t:now,n:0,list:[]};
  if(L2.filter(o=>o.stage=='counter').length<3&&Math.random()<.7)L2.push({no:'1031-0'+String(++DS.n+10).padStart(2,'0'),stage:'counter',slot:'12:'+String((10+DS.n*5)%60).padStart(2,'0'),at:now});
  return {ok:true,today:30+DS.n,orders:L2.map(({no,stage,slot})=>({no,stage,slot}))}}
 if(DEMO){const DP=+DEMO>1?+DEMO:3000;setInterval(()=>{if(!stopped)fetchLive().then(apply)},DP)}
+// ---- LINE 認人：只在 LINE 裡打開、而且有填 LIFF_ID 才做；任何失敗都安靜略過，照樣用手機記住的單
+async function lineMine(){if(!LIFF_ID||DEMO||!/ Line\//i.test(navigator.userAgent))return;
+ try{await new Promise((ok,ng)=>{const sc=document.createElement('script');sc.src='https://static.line-scdn.net/liff/edge/2/sdk.js';sc.onload=ok;sc.onerror=ng;document.head.appendChild(sc)});
+  await liff.init({liffId:LIFF_ID});if(!liff.isLoggedIn()){if(liff.isInClient())liff.login({redirectUri:location.href});return}
+  const tok=liff.getIDToken();if(!tok)return;
+  const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'mine',idToken:tok})});const d=await r.json();
+  if(d&&d.ok){LINE_ON=true;(d.orders||[]).forEach(o=>{if(o&&o.no&&!MINE.has(o.no))MINE.set(o.no,'')});myKey='';if(stopped&&MINE.size){stopped=false;poll()}}}
+ catch(e){}}
+lineMine();
 poll();
 </script></body></html>
