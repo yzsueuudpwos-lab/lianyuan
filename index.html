@@ -70,12 +70,39 @@ pre{white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:10px;font
 .ctot{text-align:right;font-size:21px;font-weight:700;margin:10px 0 4px}
 .btn.more{background:#fff;color:var(--g);border:2px solid var(--g);font-size:19px}
 footer{text-align:center;font-size:12px;color:#999;padding:20px}
+nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
+.ymentry{display:block;margin:12px 14px 0;background:#fff7e8;border:2px solid #e0a800;border-radius:14px;padding:14px;text-decoration:none;color:#6a3e00;font-weight:800;font-size:18px;line-height:1.45}
+.ymentry span{display:block;font-weight:600;font-size:14px;color:#7a5a30;margin-top:4px}
+.ym-prov{background:#fff7e8;border:2px solid #e0a800;border-radius:14px;padding:12px;line-height:1.5;margin:0 0 10px}
+.ym-scope{background:#fdecea;border-radius:12px;padding:10px 12px;color:#8a2b20;line-height:1.45;margin:0 0 10px;font-weight:700}
+.ym-demo{display:inline-block;background:#c0392b;color:#fff;border-radius:8px;padding:1px 8px;margin-right:6px}
+.ympic{height:84px;border-radius:12px;background:repeating-linear-gradient(45deg,#f6f1e4,#f6f1e4 10px,#efe4cc 10px,#efe4cc 20px);display:flex;align-items:center;justify-content:center;color:#8a7048;font-weight:800;margin-bottom:8px}
+.ymcard{background:#fff;border-radius:14px;padding:12px;margin:0 0 12px;box-shadow:0 2px 8px #0001}
+.ymcard h3{margin:0 0 4px;font-size:18px}
+.ymtag{display:inline-block;background:#fff3e6;color:#a15c12;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:800;margin:2px 4px 2px 0}
+.ymprice{color:#c8702a;font-weight:800;font-size:16px;line-height:1.35}
+.ymsub{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #eee}
+.ymcard .qty button{width:48px;height:48px;touch-action:manipulation}
+#ysheet{display:none;position:fixed;inset:0;background:#0006;z-index:21}
+#ysheet .in{position:absolute;bottom:0;left:0;right:0;max-height:92vh;overflow:auto;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+#ysheet h2{border:0;padding:0;margin:0 0 8px;font-size:22px}
+#ysheet .back{border:0;background:#eaf3e6;color:#3f7d3a;font-size:18px;font-weight:800;border-radius:12px;min-height:48px;padding:10px 14px}
+#ymStatus{white-space:pre-wrap;margin-top:8px}
+#ymStatus.bad{background:#fdecea;color:#8a1f12;border-radius:12px;padding:10px;font-weight:800}
+#ymStatus.ok{background:#e7f6e4;color:#1d6b32;border-radius:12px;padding:10px;font-weight:800}
+#ymStatus.load{background:#fff6d8;color:#6a4a00;border-radius:12px;padding:10px;font-weight:800}
+#ybar{display:none;position:fixed;left:10px;right:96px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:9;background:#fff7e8;color:#6a3e00;border:2px solid #e0a800;border-radius:16px;padding:8px 10px;font-size:15px;font-weight:800;align-items:center;gap:8px}
+#ybar.show{display:flex}
+#ybar button,#ymOpenSheetBtn{touch-action:manipulation}
+#ymOpenSheetBtn{background:#c8702a;color:#fff;font-size:18px;min-height:52px}
+#yearmeal{scroll-margin-top:72px}
 .seg{display:flex;gap:8px;margin:6px 0 4px}.seg button{flex:1;font-size:18px;font-weight:700;padding:14px 4px;border:2px solid var(--g);border-radius:14px;background:#fff;color:var(--g)}.seg button.on{background:var(--g);color:#fff}.seg button:disabled{opacity:.4}
 .mdl .rd{background:#c0392b;color:#fff}.mdl .gy{background:#e5e5e5;color:#333}.mdl .ln{background:#06c755;color:#fff}.mdl .sm{font-size:15px;color:#777}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
-<nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
+<nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a class="ymnav" href="#yearmeal">🧧 年菜預購</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
 <div class="hero"><img src="店家封面.jpg" alt="蓮緣素食"><div><h1>蓮緣素食餐坊</h1><p>純素便當・手工素餃・港式蘿蔔糕｜光復南路410號</p></div></div>
+<a class="ymentry" id="yearEntry" href="#yearmeal">🧧 年菜預購（跟今日便當分開）<span>現在顯示 2024 年舊菜單參考，不是已核對的本季菜單。取餐日要等店家設定，不會變成今天的便當。</span></a>
 
 <div id="pauseBan" style="display:none;margin:12px 14px 0;background:#fff3e6;border:2px solid #e0a800;border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.6;font-weight:700;color:#8a4b00"></div>
 <section id="how"><h2>訂購方式</h2><p class="note">選好餐點 → 填資料 → 用 LINE 或電話送出</p>
@@ -85,6 +112,11 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <p class="note">📅 <b>30 個以上請預訂</b>：取餐<b>前一天</b>下午 3 點前訂，最多可訂 30 天內；30 個以下當天現做也可以。<b>第一次訂大單需付 30% 訂金，訂過的老客人免訂金</b>（送出後會告訴你要不要付）。<b>取餐前兩天</b>以前取消才退訂金；前一天才取消不退（菜已經買好了）。</p></section>
 
 <div id="menuSecs"></div>
+<section id="yearmeal"><h2>🧧 年菜預購</h2>
+<p class="note">這區跟上面的今日便當分開結帳，不會進今天的取餐時段。</p>
+<div id="ymRoot"><p class="note">讀取年菜目錄…</p></div>
+<button type="button" class="btn" id="ymOpenSheetBtn">看年菜預購單</button>
+</section>
 
 
 <section id="info"><h2>店家資訊</h2><div class="info">
@@ -115,8 +147,23 @@ footer{text-align:center;font-size:12px;color:#999;padding:20px}
 <p class="note">會開啟蓮緣 LINE 官方帳號，訂單已幫你打好，按「傳送」即可</p>
 <button class="btn" onclick="closeSheet()" style="background:#fff;color:#555;border:1.5px solid #bbb;font-size:15px;padding:10px">← 返回修改</button>
 </div></div>
+<div id="ysheet"><div class="in">
+<h2>年菜預購單・範例</h2>
+<button type="button" class="back" id="ymClose">← 返回年菜</button>
+<div id="ymLines"></div>
+<div class="info" id="ymSeasonBox" style="margin-top:8px"></div>
+<label>姓名</label><input id="ymNm" autocomplete="off" placeholder="預覽請填範例姓名">
+<label>電話</label><input id="ymPh" type="tel" autocomplete="off" placeholder="預覽請填範例電話">
+<label>取餐日</label><select id="ymDate" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select>
+<label>備註</label><textarea id="ymNt" rows="2" autocomplete="off" placeholder="可不填"></textarea>
+<div id="ymStatus" role="status"></div>
+<button type="button" class="btn" id="ymSubmit" style="background:#c8702a;color:#fff;min-height:52px">把這張預覽單留在這台裝置</button>
+<p class="note">這顆按鈕不會傳 LINE、不會送到店家、不會列印，也沒有寫進訂單表。</p>
+</div></div>
+<div id="ybar"><span id="ybarN">年菜已選 0 項</span><button type="button" id="ybarGo">看預購單</button></div>
 <div class="mdl" id="okMdl"><div class="bx" id="okBx"></div></div><div class="mdl" id="cMdl"><div class="bx" id="cBx"></div></div>
 <script src="menu.js"></script>
+<script src="yearmeal.js"></script>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上）
 // 菜單：[分類, 品名, 價錢, 說明, 照片, {lim,from,to}]；先用 menu.js 的備用菜單，讀到後台「菜單」表就換掉
@@ -125,7 +172,8 @@ let M=MENU.map(m=>[CATN[m[0]],m[1],m[2],m[3],m[4]?m[4]+'.jpg':'',{}]);
 let q=M.map(()=>0);
 function okImg(u){u=String(u||'');return /^https:\/\/lh3\.googleusercontent\.com\//.test(u)||/^[^\/:?#"'<>\\]+\.(jpg|jpeg|png)$/i.test(u)?u:''}
 function setMenu(list){const t=ymd(new Date()),old={};M.forEach((m,i)=>old[m[1]]=q[i]);
- M=list.filter(x=>x.on&&!(x.lim&&x.to&&x.to<t)).map(x=>[x.cat||'單點',x.name,+x.price||0,x.desc||'',okImg(x.photo),{lim:!!x.lim,from:x.from,to:x.to}]);q=M.map(m=>old[m[1]]||0)}
+ window.YM_HELD_N=(list||[]).filter(x=>x&&(x.cat==='年菜預購'||x.kind==='yearmeal')).length;
+ M=list.filter(x=>x.on&&x.cat!=='年菜預購'&&x.kind!=='yearmeal'&&!(x.lim&&x.to&&x.to<t)).map(x=>[x.cat||'單點',x.name,+x.price||0,x.desc||'',okImg(x.photo),{lim:!!x.lim,from:x.from,to:x.to}]);q=M.map(m=>old[m[1]]||0)}
 function md(k){const [y,m,d]=String(k).split('-').map(Number);return m+'/'+d}
 // 購物車裡有「限定期間」的品項 → 只能選那段日期取餐
 function dayAllowed(day){const k=ymd(day);return M.every((m,i)=>!q[i]||!m[5].lim||(k>=m[5].from&&k<=m[5].to))}
@@ -138,7 +186,7 @@ function imgOf(m){if(S.menu)return m[4];const u=S.photo[m[1]];return /^https:\/\
 function render(){const cats=[];M.forEach(m=>{if(!cats.includes(m[0]))cats.push(m[0])});const sid=c=>{const k=Object.keys(CATN).find(k=>CATN[k]==c);return k?'c'+k:'cx'+cats.indexOf(c)};
  document.getElementById('menuSecs').innerHTML=cats.map((c,j)=>`<section id="${sid(c)}"><h2>${esc(c)}</h2>${CATNOTE[c]?`<p class="note">${CATNOTE[c]}</p>`:''}<div id="L${j}"></div></section>`).join('');
  document.getElementById('catNav').innerHTML=cats.map(c=>`<a href="#${sid(c)}">${esc(c)}</a>`).join('');
-M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m),L=m[5].lim?`<span class="lim">🧧 限定 ${md(m[5].from)}–${md(m[5].to)} 取餐</span>`:'';document.getElementById('L'+cats.indexOf(m[0])).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3>${L}<p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)})}
+M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m),L=m[5].lim?`<span class="lim">🧧 限定 ${md(m[5].from)}–${md(m[5].to)} 取餐</span>`:'';document.getElementById('L'+cats.indexOf(m[0])).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3>${L}<p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)});try{window.ymOnMenuRender&&window.ymOnMenuRender()}catch(err){}}
 render();
 // 讀店家設定（價錢、照片、今天賣完、預訂日曆）；讀不到就用 menu.js 的預設值
 function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
@@ -273,4 +321,6 @@ function cRes(st,id,t){clearTimeout(cPoll);const C={cancelled:['✅','已取消'
  mdl('cMdl',`<div style="font-size:48px">${C[0]}</div><h3 style="color:${st=='cancelled'?'#2e7d32':'#c0392b'}">${C[1]}</h3><p>${C[2]}</p><button class="bb ok" onclick="clearTimeout(cPoll);mdl('cMdl','')">好</button>`);
  if(st=='request')cPoll=setTimeout(async()=>{let d={};try{d=await gpost({action:'cstatus',id,t})}catch(e){}cRes(d.ok?d.state:'request',id,t)},10000)}
 {const u=new URLSearchParams(location.search);if(u.get('cancel')&&u.get('t'))setTimeout(()=>{const m=document.getElementById('pauseMdl');if(m)m.style.display='none';cancelFlow(u.get('cancel'),u.get('t'))},300)}
-</script></body></html>
+</script>
+<script src="yearmeal-customer.js"></script>
+</body></html>
