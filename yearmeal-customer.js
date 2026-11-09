@@ -153,7 +153,7 @@
     if (!root || !ymLoaded) return;
     var state = ymLoaded.state;
     var src = ymLoaded.source;
-    var head = '<div class="ym-prov" id="ymProv"><b>2024 年舊菜單參考</b><br>來源是當年 Facebook 貼文的紙本清單，<b>不是已經核對過的本季菜單</b>。價錢先沿用當時數字，標成參考價。舊文裡的截止日沒有帶進來。</div>';
+    var head = '<div class="ym-prov" id="ymProv"><span class="ym-demo">預覽版</span><b>不是正式預購，也不會預約成功。</b><br>只存在這台瀏覽器，不會送到店家。下面是 <b>2024 年舊菜單參考</b>，不是已經核對過的本季菜單。價錢先沿用當時數字。舊文裡的截止日沒有帶進來。</div>';
     if (src === 'device') {
       head += '<div class="ym-scope">這台裝置有店家預覽修改（' + YM.esc(state.savedAt ? state.savedAt.replace('T', ' ').slice(0, 16) : '') + '）。只存在這台瀏覽器，其他手機看不到，也還沒寫入店家後台。</div>';
     } else if (ymLoaded.error === 'bad-json') {
@@ -265,7 +265,7 @@
       var lines = built.order.lines.map(function (ln) {
         return ln.name + ' × ' + ln.qty + ' = $' + ln.lineTotal + (ln.priceConfirmed ? '' : '（2024 參考價）');
       }).join('\n');
-      setStatus('ok', '【範例】已留在這台裝置\n編號 ' + built.order.id + '\n' + lines + '\n合計 $' + built.order.total + '\n取餐日 ' + built.order.pickupDate + '\n\n沒有送到店家、沒有寫入訂單表、沒有傳 LINE、沒有列印，也不會出現在今天的接單清單。');
+      setStatus('ok', '這不是訂單，也沒有預約成功。\n預覽版只留在這台瀏覽器。\n【範例】編號 ' + built.order.id + '\n' + lines + '\n合計 $' + built.order.total + '\n取餐日 ' + (built.order.pickupDate || '未填') + '\n\n沒有送到店家、沒有寫入訂單表、沒有傳 LINE、沒有列印，也不會出現在今天的接單清單。');
     } catch (e) {
       setStatus('bad', '沒有存成：' + (e && e.message ? e.message : e));
     } finally {

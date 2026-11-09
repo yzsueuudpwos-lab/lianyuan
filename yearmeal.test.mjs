@@ -172,6 +172,9 @@ test('bento files stay free of year-meal network calls', () => {
   assert.match(index, /items:M\.map\(\(m,i\)=>q\[i\]\?\{n:m\[1\],q:q\[i\]\}:null\)/);
   assert.match(index, /x\.cat!=='年菜預購'/);
   assert.match(index, /ymOnMenuRender/);
+  assert.match(index, /預覽版・不是正式預購/);
+  assert.match(fs.readFileSync(path.join(root, 'yearmeal-customer.js'), 'utf8'), /這不是訂單，也沒有預約成功/);
+  assert.match(fs.readFileSync(path.join(root, 'yearmeal-staff.js'), 'utf8'), /不是正式年菜接單/);
   const staff = fs.readFileSync(path.join(root, 'staff.html'), 'utf8');
   assert.match(staff, /function printOrder\(o\)\{const L=labelsOf\(o\);if\(!L\.length\)\{toast\('沒有要印的品項'\);return\}/);
   assert.match(staff, /0x1d,0x76,0x30,0/);

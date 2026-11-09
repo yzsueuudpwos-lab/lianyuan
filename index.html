@@ -100,9 +100,9 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 .mdl .rd{background:#c0392b;color:#fff}.mdl .gy{background:#e5e5e5;color:#333}.mdl .ln{background:#06c755;color:#fff}.mdl .sm{font-size:15px;color:#777}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
-<nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a class="ymnav" href="#yearmeal">🧧 年菜預購</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
+<nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a class="ymnav" href="#yearmeal">🧧 年菜預覽</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
 <div class="hero"><img src="店家封面.jpg" alt="蓮緣素食"><div><h1>蓮緣素食餐坊</h1><p>純素便當・手工素餃・港式蘿蔔糕｜光復南路410號</p></div></div>
-<a class="ymentry" id="yearEntry" href="#yearmeal">🧧 年菜預購（跟今日便當分開）<span>現在顯示 2024 年舊菜單參考，不是已核對的本季菜單。取餐日要等店家設定，不會變成今天的便當。</span></a>
+<a class="ymentry" id="yearEntry" href="#yearmeal">🧧 年菜預覽版（不會送到店家）<span>只存在這台瀏覽器，不是正式預約，也不是訂單。現在顯示 2024 年舊菜單參考，不是已核對的本季菜單。</span></a>
 
 <div id="pauseBan" style="display:none;margin:12px 14px 0;background:#fff3e6;border:2px solid #e0a800;border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.6;font-weight:700;color:#8a4b00"></div>
 <section id="how"><h2>訂購方式</h2><p class="note">選好餐點 → 填資料 → 用 LINE 或電話送出</p>
@@ -112,10 +112,10 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <p class="note">📅 <b>30 個以上請預訂</b>：取餐<b>前一天</b>下午 3 點前訂，最多可訂 30 天內；30 個以下當天現做也可以。<b>第一次訂大單需付 30% 訂金，訂過的老客人免訂金</b>（送出後會告訴你要不要付）。<b>取餐前兩天</b>以前取消才退訂金；前一天才取消不退（菜已經買好了）。</p></section>
 
 <div id="menuSecs"></div>
-<section id="yearmeal"><h2>🧧 年菜預購</h2>
-<p class="note">這區跟上面的今日便當分開結帳，不會進今天的取餐時段。</p>
+<section id="yearmeal"><h2>🧧 年菜預覽版</h2>
+<p class="note">預覽版：按下去不會變成店家的訂單，也不會預約成功。資料只留在這台瀏覽器，跟今日便當分開。</p>
 <div id="ymRoot"><p class="note">讀取年菜目錄…</p></div>
-<button type="button" class="btn" id="ymOpenSheetBtn">看年菜預購單</button>
+<button type="button" class="btn" id="ymOpenSheetBtn">看年菜預覽單</button>
 </section>
 
 
@@ -148,7 +148,8 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <button class="btn" onclick="closeSheet()" style="background:#fff;color:#555;border:1.5px solid #bbb;font-size:15px;padding:10px">← 返回修改</button>
 </div></div>
 <div id="ysheet"><div class="in">
-<h2>年菜預購單・範例</h2>
+<h2>預覽版・不是正式預購</h2>
+<p class="note">這張單只留在這台瀏覽器，不會送到店家，也不是預約。</p>
 <button type="button" class="back" id="ymClose">← 返回年菜</button>
 <div id="ymLines"></div>
 <div class="info" id="ymSeasonBox" style="margin-top:8px"></div>

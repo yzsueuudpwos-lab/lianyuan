@@ -86,7 +86,8 @@
     if (!opts || !opts.skipCapture) captureSeason();
     var s = ymState.season;
     var src = ymState.scope === 'device-local-preview' ? 'device' : 'seed';
-    var banner = '<div class="ym-prov" id="ymProv"><span class="ym-demo">歷史參考</span><b>2024 年 Facebook 舊菜單，尚未經本季確認。</b><br>系統不會把它當成已核對的本季菜單。舊文的「二月八日前」沒有設成截止日。八張沒有品名的舊照片也不會拿來對菜。</div>';
+    var banner = '<div class="ym-scope"><span class="ym-demo">預覽版</span>不是正式年菜接單。改完只存在這台瀏覽器，不會同步到其他裝置，也不會變成客人的預約。</div>';
+    banner += '<div class="ym-prov" id="ymProv"><span class="ym-demo">歷史參考</span><b>2024 年 Facebook 舊菜單，尚未經本季確認。</b><br>系統不會把它當成已核對的本季菜單。舊文的「二月八日前」沒有設成截止日。八張沒有品名的舊照片也不會拿來對菜。</div>';
     banner += '<div class="ym-scope">儲存範圍：只寫這台瀏覽器（localStorage）。不是全店同步，沒有寫入 Google 試算表，也不會改到便當菜單。Apps Script 要等另行核准才接得上，現在沒有接。</div>';
     if (window.YM_PREVIEW) banner += '<div class="ym-scope"><span class="ym-demo">範例</span>離線預覽：沒有登入正式接單，沒有向後台要訂單或菜單。</div>';
     if (src === 'device') banner += '<div class="tip">這台裝置上次儲存：' + YM.esc((ymState.savedAt || '').replace('T', ' ').slice(0, 16)) + '。其他手機看不到。</div>';
