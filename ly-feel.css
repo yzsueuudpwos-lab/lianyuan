@@ -1,0 +1,11 @@
+/* 20261110 iPhone 觸覺：透明 switch 蓋在按鈕上（照抄記帳 App） */
+.haptic-btn{position:relative;isolation:isolate}
+.ios-haptic{position:absolute;inset:0;z-index:2;overflow:hidden;border-radius:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ios-haptic input{position:absolute;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
+.ios-haptic-lab{position:absolute;inset:0;cursor:pointer;margin:0}
+/* 20261110 加到主畫面提示（記帳 App 卡片樣式，改蓮緣綠） */
+.a2hs{position:relative;z-index:10;display:flex;align-items:flex-start;gap:10px;background:#fff;border:1.5px solid #3f7d3a;border-radius:14px;
+  padding:12px 12px 12px 14px;margin:10px 12px;font-size:16px;line-height:1.5;color:#1f3d1c;box-shadow:0 1px 3px rgba(0,0,0,.08);font-family:inherit}
+.a2hs[hidden]{display:none}
+.a2hs .a2hs-t{flex:1}
+.a2hs .a2hs-x{flex:none;margin:0;min-height:36px;min-width:36px;padding:4px 10px;font-size:18px;border:0;border-radius:10px;background:#eaf3e6;color:#3f7d3a;cursor:pointer}

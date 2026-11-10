@@ -1,7 +1,7 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>蓮緣接單</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#3f7d3a">
-<link rel="icon" href="icon.png"><script src="menu.js"></script><script src="yearmeal.js"></script><link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png"><script src="menu.js"></script><script src="yearmeal.js"></script><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script>
 <style id="pagecss">@page{size:40mm 30mm;margin:0}.sg{background:#fff3c4;border:1px solid #e0a800;border-radius:8px;font-weight:700}.sgd{color:#4c9e3a;font-size:13px}</style>
 <style>
 body{margin:0;font-family:"Noto Sans TC","PingFang TC",sans-serif;background:#f5f5f0;color:#222;font-size:26px}
@@ -167,13 +167,18 @@ body.phone #goSt{font-size:18px}body.phone #goPeek{font-size:16px}
 #ymEditor .pbtn button.g2{background:#e8f3e8;color:#2e7d32}
 #ymEPic{width:100%;max-height:220px;object-fit:cover;border-radius:10px;background:#eee}
 #ymEditor .nopic{min-height:88px;display:flex;align-items:center;justify-content:center;background:#eee;border-radius:10px;color:#666;font-size:16px}
-</style></head><body><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
+/* 20261110 出單／儲存回饋 */
+#toast{white-space:pre-line;max-width:92vw;box-sizing:border-box;text-align:center;line-height:1.45}
+#printSt{display:none;border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:22px;font-weight:700;line-height:1.45}
+#printSt.ok{display:block;background:#e7f6e4;color:#1d6b32;border:2px solid #8fcf86}#printSt.bad{display:block;background:#fdecea;color:#8a2b20;border:2px solid #e6a49b}
+body.phone #printSt{font-size:17px}
+</style></head><body><div class="a2hs" id="a2hs" role="note" hidden><span class="a2hs-t">📲 把接單加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面</span><button type="button" class="a2hs-x" id="a2hs-x" aria-label="關閉提示">✕</button></div><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
 <header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="viewBtn" onclick="setView(!document.body.classList.contains('phone'))">💻 平板版</button><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
 <main>
 <div id="goView"><div style="font-size:30px;font-weight:700;color:#3f7d3a">🥬🍱 蓮緣素食 🥕</div><button id="goBtn" onclick="goOnline()">上線<small>🌱</small></button><div id="goSt"><b>● 目前暫停接單</b><br>按大圓圈開始接今天的單</div><button id="goPeek" onclick="document.body.classList.add('peek')">先看訂單（不上線）</button></div><button id="backGo" onclick="document.body.classList.remove('peek')">← 回到上線畫面</button><button id="onBtn" class="off" onclick="toggleOnline()">🔴 暫停接單（按這裡上線）</button><div id="onTip">今天還沒上線，客人只能預訂明天以後</div>
-<div id="manual"></div>
+<div id="printSt" role="status" aria-live="polite"></div><div id="manual"></div>
 <div id="list"><div class="empty">等待新訂單…</div></div>
 <h2>今天處理過的</h2><div id="done"></div>
 <div class="set">標籤尺寸 <select id="size" onchange="setSize()"><option value="40">40×30mm</option><option value="58">58×40mm</option></select>
@@ -218,7 +223,7 @@ const SHOP='蓮緣素食',SIDE=['白飯','五穀飯','龜苓膏'],POLL=10000;
 let manualMsg={},seenCC=null;let PIN=localStorage.ly_pin||'',seen=null,busy={},AC=null,data={pending:[],done:[]};
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3000)}
+function toast(t,ms){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',ms||3000)}
 // ===== 大字提示框（取代瀏覽器的 alert/confirm/prompt）=====
 // ask({ic,t,m,ok,okc,no,num}) → Promise：按確定 = true（有 num 就回傳數字），取消 = false/null
 function ask(o){return new Promise(res=>{const A=$('ask');$('askIc').textContent=o.ic||'';$('askT').textContent=o.t||'';$('askT').className=o.okc=='gr'?'g':'';$('askM').textContent=o.m||'';
@@ -227,7 +232,7 @@ function ask(o){return new Promise(res=>{const A=$('ask');$('askIc').textContent
  if(o.no!==false){const c=document.createElement('button');c.className='cn';c.textContent=o.no||'取消';c.onclick=()=>done(o.num!=null?null:false);B.appendChild(c)}
  const k=document.createElement('button');k.className=o.okc||'gr';k.textContent=o.ok||'確定';k.onclick=()=>done(o.num!=null?Math.max(0,parseInt(String($('askNum').value).replace(/\D/g,''),10)||0):true);B.appendChild(k);
  A.style.display='flex';if(o.num!=null)setTimeout(()=>$('askNum').focus(),50)})}
-function say(m,t){return ask({ic:'⚠️',t:t||'沒有存到',m,ok:'好',okc:'or',no:false})}
+function say(m,t){lyHaptic('error');return ask({ic:'⚠️',t:t||'沒有存到',m,ok:'好',okc:'or',no:false})}
 // JSONP
 function api(p){return new Promise((res,rej)=>{if(window.YM_PREVIEW)return rej('預覽模式不連線');if(!GAS_URL)return rej('尚未設定後端網址');const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),s=document.createElement('script');
  const t=setTimeout(()=>{clean();rej('逾時')},15000);function clean(){clearTimeout(t);delete window[cb];s.remove()}
@@ -266,7 +271,7 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
  $('done').innerHTML=d.done.map(o=>`<div class="done${o.status=='客人已取消'?' cc':''}${o.late?' late':''}"><span>${{'已接單':'✅','售完':'❌','取消':'🚫','客人已取消':'🙅'}[o.status]||''} ${o.status=='客人已取消'?'<span class="cct">客人已取消・不用做</span>':esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜$${o.total}
  ${o.status=='客人已取消'?'':String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':`<span class="lno">請手動回覆${why(o.reply)?'（'+esc(why(o.reply))+'）':''}</span>`}</span>
  <span>${o.status=='已接單'?`${o.late?`<b class="lt">⏰ 過了取餐時間 ${esc(slotTxt(o.pickup))}</b>`:''}${o.stage=='picked'?'<b class="sgd">👋 已取貨 ✔</b> ':`<button class="sg big${o.stage=='ready'?' r':''}" onclick="stgNext('${esc(o.id)}')">${o.stage=='ready'?'👋 已取貨':'🍱 做好了'}</button> `}<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
- $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}${manualWhy[id]?`<div style="font-size:22px;font-weight:400;margin-top:4px">原因：${esc(manualWhy[id])}</div>`:''}<button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('')}
+ $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}${manualWhy[id]?`<div style="font-size:22px;font-weight:400;margin-top:4px">原因：${esc(manualWhy[id])}</div>`:''}<button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('');lyScan()}
 // ===== 上線／暫停接單 =====
 let ONLINE={open:false,why:'paused'},manualWhy={};
 // 後台回的 reply 例如「⚠ 取消 15:02 客人沒有在 LINE 傳訂單編號…」→ 只留原因
@@ -291,7 +296,8 @@ async function act(id,st){ack(id);const o=find(id);if(!o)return;const lab=st;if(
  busy[id]=1;render(data);
  api({action:'set',id,status:st}).then(r=>{const say={'已接單':'收到，請於 '+o.pickup+' 取餐。下次訂餐直接點👉 https://yzsueuudpwos-lab.github.io/lianyuan/','售完':'今天已售完，抱歉','取消':'訂單已取消','不同意取消':'店家已開始製作，無法取消，有問題請來電'}[st];
  if(r.manual){manualMsg[id]=`${o.name}（編號 ${id}）→ 回「${say}」`;manualWhy[id]=why(r.reply);ding()}else delete manualMsg[id];
- toast(r.manual?'請手動在 LINE 回覆客人':({'取消':lab=='同意取消'?'已同意取消':'取消','不同意取消':'已回覆客人：不能取消'}[st]||st)+'，已自動回覆 LINE ✅');delete busy[id];if(st=='已接單')stg(id,'making').catch(()=>{});poll();quota.t=0})
+ lyHaptic('success');const pm=st=='已接單'&&lastPrint&&Date.now()-lastPrint.at<120000?'\n'+lastPrint.msg:'';
+ toast((r.manual?'請手動在 LINE 回覆客人':({'取消':lab=='同意取消'?'已同意取消':'取消','不同意取消':'已回覆客人：不能取消'}[st]||st)+'，已自動回覆 LINE ✅')+pm,pm?7000:3000);delete busy[id];if(st=='已接單')stg(id,'making').catch(()=>{});poll();quota.t=0})
  .catch(e=>{delete busy[id];render(data);say('請再按一次：'+e)})}
 function reprint(id){const o=find(id);if(o){printOrder(o);onPrinted(id)}}
 // ---- 標籤（與 print.html 相同版面）----
@@ -314,11 +320,17 @@ function raster(c){const g=c.getContext('2d'),W=c.width,H=c.height,d=g.getImageD
  out.push(0x0a,0x0a,0x0a);return out}
 function b64(arr){let s='';for(let i=0;i<arr.length;i+=8192)s+=String.fromCharCode.apply(null,arr.slice(i,i+8192));return btoa(s)}
 function rawbtUrl(bytes){return 'intent:base64,'+b64(bytes)+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;'}
-function printOrder(o){const L=labelsOf(o);if(!L.length){toast('沒有要印的品項');return}const m=$('mode').value;if(m=='none')return;
- if(m=='rawbt'&&/Android/i.test(navigator.userAgent)){let bytes=[0x1b,0x40];L.forEach(l=>bytes=bytes.concat(raster(draw(l))));location.href=rawbtUrl(bytes);return}
+// 20261110 出單結果寫在畫面上（狀態列＋提示），並配觸覺；lastPrint 讓接單成功的提示接得上
+let lastPrint=null;
+function printSay(msg,ok,hap){lastPrint={msg,ok,at:Date.now()};const e=$('printSt');if(e){e.className=ok?'ok':'bad';e.textContent='🖨 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})+'　'+msg}
+ lyHaptic(hap||(ok?'success':'error'));toast(msg,6000);return ok}
+function printOrder(o){const L=labelsOf(o);if(!L.length)return printSay('沒有可印的品項。若要再試，請按「補印」。',false);const m=$('mode').value;
+ if(m=='none')return printSay('目前設定為不列印。要出單請先改「列印方式」，或按「補印」。',false,'light');
+ if(m=='rawbt'&&!/Android/i.test(navigator.userAgent))return printSay('RawBT 只能在 Android 平板使用。這台裝置叫不到 RawBT，請改用「系統列印」，或到店裡平板按「補印」。',false);
+ if(m=='rawbt'&&/Android/i.test(navigator.userAgent)){let bytes=[0x1b,0x40];L.forEach(l=>bytes=bytes.concat(raster(draw(l))));location.href=rawbtUrl(bytes);return printSay('已送到 RawBT 列印。如果沒有印出來，請按「補印」。',true)}
  $('labels').innerHTML=L.map(l=>`<div class="lab"><div class="h"><span>${SHOP}</span><span>${l.no}</span></div>
  <div class="n">${esc(l.name)}　${l.phone?'#'+l.phone.slice(-3):''}</div><div class="i">${esc(l.item)}</div>
- <div class="t">取餐 ${esc(l.time)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('');setTimeout(()=>window.print(),50)}
+ <div class="t">取餐 ${esc(l.time)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('');setTimeout(()=>window.print(),50);return printSay('已開啟系統列印。如果沒有印出來，請按「補印」。',true)}
 function testPrint(){printOrder({name:'測試',phone:'0912345678',pickup:'今天 下午 4:30',items:'測試便當 x1',note:''})}
 // ===== ⚙ 店家設定（存到 Google 表格「設定」，客人網頁會即時讀取）=====
 let ST=null,curTab='menu',newPrice={},picFor='';
@@ -329,7 +341,7 @@ function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
 function baseOpen(d){return d.getDay()!=0||[1,15].includes(lunarDay(d))}
 function priceOf(m){return +(ST.price||{})[m[1]]||m[2]}
 function showSet(on){if(window.YM_PREVIEW){document.body.classList.add('setmode');window.scrollTo(0,0);if(window.ymStaffPaint)tab('year');return}document.body.classList.toggle('setmode',on);window.scrollTo(0,0);if(on){$('setBody').innerHTML='<div class="empty">讀取中…</div>';api({action:'settings'}).then(d=>{ST=d;newPrice={};tab(curTab)}).catch(e=>{$('setBody').innerHTML='<div class="empty">⚠ 讀不到便當設定：'+esc(e)+'</div><div class="grp"><button class="row act" type="button" onclick="tab(\'year\')">仍開啟年菜（只存在這台裝置，不改線上菜單）</button></div>'})}}
-function save(d,msg){toast('儲存中…');return api({action:'save',data:JSON.stringify(d)}).then(r=>{ST=r;toast(msg||'已儲存 ✅');tab(curTab)}).catch(e=>say('請再按一次：'+e))}
+function save(d,msg){toast('儲存中…');return api({action:'save',data:JSON.stringify(d)}).then(r=>{ST=r;lyHaptic('success');toast(msg||'已儲存 ✅');tab(curTab)}).catch(e=>say('請再按一次：'+e))}
 function tab(t){if(window.YM_PREVIEW&&t!=='year')t='year';if(curTab==='year'&&t!=='year'&&window.ymCaptureSeason)window.ymCaptureSeason();curTab=t;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));if(!ST&&t!=='year')return;const B=$('setBody');
  if(t=='cal'){const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);let h='<div class="tip">綠色＝接預訂，灰色＝不接。<b>按日期</b>就切換。<br>按「上限」可設這天最多接幾個預訂便當。（30 個以上才算預訂）</div><div class="cal">'+[...WK].map(w=>`<div class="wk">${w}</div>`).join('');
   for(let i=0;i<start.getDay();i++)h+='<div class="day na"></div>';
@@ -362,7 +374,7 @@ function swSync(){$('eOnSw').classList.toggle('on',$('eOn').checked);$('eLimSw')
 function picShow(u){$('ePic').src=u||'';$('ePic').style.display=u?'block':'none';$('eNoPic').style.display=u?'none':'flex'}
 function edMv(d){const j=EI+d;if(EI<0||j<0||j>=ST.menu.length)return;edClose();mv(EI,d);toast(d<0?'往前移了 ⬆':'往後移了 ⬇')}
 function saveMenu(L,msg){toast('儲存中…');return postJ({action:'menu',pin:PIN,items:L})
- .then(r=>{if(!r.ok)throw r.error;ST=r;toast(msg||'已儲存 ✅ 客人網頁會更新');tab(curTab);return true}).catch(e=>{say(e=='pin'?'密碼不對，請重新登入':String(e));tab(curTab);return false})}
+ .then(r=>{if(!r.ok)throw r.error;ST=r;lyHaptic('success');toast(msg||'已儲存 ✅ 客人網頁會更新');tab(curTab);return true}).catch(e=>{say(e=='pin'?'密碼不對，請重新登入':String(e));tab(curTab);return false})}
 function copyM(){return (ST.menu||[]).map(x=>({...x}))}
 function mv(i,d){const L=copyM(),j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];ST.menu=L;tab('menu');clearTimeout(mv.t);mv.t=setTimeout(()=>saveMenu(ST.menu,'順序已儲存 ✅'),900)}
 async function onOff(i){const L=copyM(),x=L[i];x.on=!x.on;
@@ -419,4 +431,8 @@ function onPrinted(id){const o=find(id);if(o&&o.status=='已接單'&&!o.stage)st
 function slotTxt(p){const m=String(p||'').match(/\d{1,2}:\d{2}/);return m?m[0]:''}
 </script>
 <script src="yearmeal-staff.js"></script>
+<script>// 20261110 手感：接單／補印／儲存加 iPhone 觸覺（動態按鈕在 render 後會再蓋一次）；加到主畫面提示（接單頁）
+lyScan('.btns button.ok');lyScan('.done button[onclick^="reprint"]');lyScan('#edSave');lyScan('#ed .sh button.done');
+lyA2hs('ly-a2hs-dismissed-staff','📲 把接單加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面','📲 把接單加到主畫面，用起來會全螢幕像 App：瀏覽器右上角 ⋮ → 加到主畫面');
+</script>
 </body></html>
