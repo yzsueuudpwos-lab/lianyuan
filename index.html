@@ -1,5 +1,6 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest-customer.json"><meta name="theme-color" content="#3f7d3a"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="蓮緣點餐"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script>
 <title>蓮緣素食餐坊｜台北光復南路純素便當・線上預訂自取</title>
 <meta name="description" content="蓮緣素食餐坊（台北市大安區光復南路410號）純素便當、餐盒、套餐線上預訂，現場自取。電話 02-2703-8823，週一至六 10:00–14:00、16:00–20:00。">
 <link rel="canonical" href="https://yzsueuudpwos-lab.github.io/lianyuan/">
@@ -101,6 +102,7 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 </style></head><body>
 <header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
 <nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a class="ymnav" href="#yearmeal">🧧 年菜預覽</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
+<div class="a2hs" id="a2hs" role="note" hidden><span class="a2hs-t">📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面</span><button type="button" class="a2hs-x" id="a2hs-x" aria-label="關閉提示">✕</button></div>
 <div class="hero"><img src="店家封面.jpg" alt="蓮緣素食"><div><h1>蓮緣素食餐坊</h1><p>純素便當・手工素餃・港式蘿蔔糕｜光復南路410號</p></div></div>
 <a class="ymentry" id="yearEntry" href="#yearmeal">🧧 年菜預覽版（不會送到店家）<span>只存在這台瀏覽器，不是正式預約，也不是訂單。現在顯示 2024 年舊菜單參考，不是已核對的本季菜單。</span></a>
 
@@ -143,7 +145,7 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
 <p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <div id="review" style="background:#f6faf3;border:2px solid #cfe5c4;border-radius:12px;padding:12px 14px;margin:14px 0 8px;font-size:16px;line-height:1.7"></div>
-<a class="btn line" id="lineBtn" href="#" onclick="lineShare();return false" style="font-size:20px;padding:18px">✅ 確定送出（用 LINE）</a>
+<a class="btn line" id="lineBtn" href="#" onclick="lineShare();return lyNoNav(event)" style="font-size:20px;padding:18px">✅ 確定送出（用 LINE）</a>
 <p class="note">會開啟蓮緣 LINE 官方帳號，訂單已幫你打好，按「傳送」即可</p>
 <button class="btn" onclick="closeSheet()" style="background:#fff;color:#555;border:1.5px solid #bbb;font-size:15px;padding:10px">← 返回修改</button>
 </div></div>
@@ -271,8 +273,8 @@ function setMode(){const n=cnt(),pre=isPre(),box=document.getElementById('preBox
 function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
  addDay(sel,day,`${m}/${dd}（${WK[day.getDay()]}）`,null)}
 ['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});
-function tmOk(){if(!document.getElementById('tm').value){alert(isPre()?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
-function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){alert('請填姓名和電話');return false}return true}
+function tmOk(){if(!document.getElementById('tm').value){lyHaptic('error');alert(isPre()?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
+function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){lyHaptic('error');alert('請填姓名和電話');return false}return true}
 function review(){const r=document.getElementById('review');if(!r)return;const v=id=>(document.getElementById(id)||{}).value||'',tm=document.getElementById('tm'),pd=document.getElementById('pd'),pre=isPre();
  const tl=tm&&tm.selectedIndex>=0&&tm.options[tm.selectedIndex]?tm.options[tm.selectedIndex].text:'（請選時間）',dl=pre&&pd&&pd.selectedIndex>=0&&pd.options[pd.selectedIndex]?pd.options[pd.selectedIndex].text+' ':'';
  r.innerHTML='<b style="font-size:17px">🧾 請確認你的訂單</b><br>'+M.map((m,i)=>q[i]?esc(m[1])+' × '+q[i]+'　$'+(m[2]*q[i]):null).filter(Boolean).join('<br>')+'<div style="border-top:1px dashed #9c9;margin:6px 0;font-weight:700;font-size:18px">合計 $'+tot()+'（共 '+cnt()+' 份）</div>🕒 取餐：'+esc(dl+tl)+'<br>👤 '+(esc(v('nm').trim())||'<span style="color:#c0392b">（請填姓名）</span>')+'　📱 '+(esc(v('ph').trim())||'<span style="color:#c0392b">（請填電話）</span>')+(v('nt').trim()?'<br>📝 '+esc(v('nt').trim()):'')}
@@ -290,9 +292,10 @@ function saveMine(id,t,d){try{const td=new Date(Date.now()+8*3600e3).toISOString
 let sending=false;
 async function lineShare(){if(sending||!ok())return false;const b=document.getElementById('lineBtn'),old=b.textContent;
  sending=true;b.textContent='⏳ 傳送中…';b.style.opacity=.6;
- window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity=''}
- if(window.PREERR){alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',paused:'店裡現在暫停接今日訂單，請改選明天以後取餐 🙏',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
+ window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity='';lyScan()}
+ if(window.PREERR){lyHaptic('error');alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',paused:'店裡現在暫停接今日訂單，請改選明天以後取餐 🙏',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
  if(cnt()>=PRE_MIN&&window.DEP!==undefined)alert(window.DEP?'💰 這是你第一次訂大單，需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家會跟你聯絡。\n取餐前兩天以前取消，訂金全額退還；前一天才取消不退。':'🙏 你是老客人，這次大單免訂金！\n如要取消，請提早告訴店家。');
+ lyHaptic('success');
  if(window.CT){showOk();return false}
  location.href=lineUrl(txt());return false}
 
@@ -324,4 +327,8 @@ function cRes(st,id,t){clearTimeout(cPoll);const C={cancelled:['✅','已取消'
 {const u=new URLSearchParams(location.search);if(u.get('cancel')&&u.get('t'))setTimeout(()=>{const m=document.getElementById('pauseMdl');if(m)m.style.display='none';cancelFlow(u.get('cancel'),u.get('t'))},300)}
 </script>
 <script src="yearmeal-customer.js"></script>
+<script>// 20261110 手感：確定送出加 iPhone 觸覺；加到主畫面提示（客人頁）
+lyScan('#lineBtn');
+lyA2hs('ly-a2hs-dismissed-customer','📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面','📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：瀏覽器右上角 ⋮ → 加到主畫面');
+</script>
 </body></html>
