@@ -1,0 +1,159 @@
+/* 20261111 蓮緣深色模式＋骨架畫面
+   淺色數值等於目前線上頁面（客人頁米底 #fbfaf6、接單頁 #f5f5f0、綠色 #3f7d3a），不要抄記帳的藍色。
+   深色用 html[data-theme="dark"] 覆蓋寫死色碼；系統深色且尚未選淺色時也套用，避免 theme.js 還沒跑完時閃白。 */
+
+:root{color-scheme:light;
+  --bg:#fbfaf6;--fg:#2b2b2b;--card:#fff;--muted:#777;--line:#eee;--grid:#ccc;
+  --input-bg:#fff;--input-border:#ccc;--top-bg:#fff;--top-fg:#3f7d3a;
+  --ok-bg:#e7f6e4;--ok-fg:#1d6b32;--err-bg:#fdecea;--err-fg:#8a1f12;--warn-bg:#fff6d8;--warn-fg:#6a4a00;
+  --sk-a:#e6eaef;--sk-b:#f3f5f8;
+  --g:#3f7d3a;--g2:#eaf3e6;--t:#2b2b2b;--o:#c8702a}
+/* 接單頁淺色底本來就是 #f5f5f0（不是客人頁的米白），標頭是綠底白字。
+   權重要低於 html[data-theme="dark"]，不然深色變數會被蓋回淺色。 */
+html:not([data-theme="dark"]) body:has(#pin){--bg:#f5f5f0;--fg:#222;--top-bg:#3f7d3a;--top-fg:#fff}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]),:root:not([data-theme="light"]) body:has(#pin){color-scheme:dark;
+    --bg:#121512;--fg:#e6e9ee;--card:#1c221c;--muted:#9aa49a;--line:#323932;--grid:#4a534a;
+    --input-bg:#252b25;--input-border:#4a534a;--top-bg:#1e3d1c;--top-fg:#fff;
+    --ok-bg:#16351f;--ok-fg:#9be0ae;--err-bg:#3d1a18;--err-fg:#ffb4ab;--warn-bg:#3b3112;--warn-fg:#f5dc8a;
+    --sk-a:#232830;--sk-b:#2d333c;
+    --g:#8fca86;--g2:#243624;--t:#e6e9ee;--o:#e09a52}
+}
+html[data-theme="dark"],html[data-theme="dark"] body:has(#pin){color-scheme:dark;
+  --bg:#121512;--fg:#e6e9ee;--card:#1c221c;--muted:#9aa49a;--line:#323932;--grid:#4a534a;
+  --input-bg:#252b25;--input-border:#4a534a;--top-bg:#1e3d1c;--top-fg:#fff;
+  --ok-bg:#16351f;--ok-fg:#9be0ae;--err-bg:#3d1a18;--err-fg:#ffb4ab;--warn-bg:#3b3112;--warn-fg:#f5dc8a;
+  --sk-a:#232830;--sk-b:#2d333c;
+  --g:#8fca86;--g2:#243624;--t:#e6e9ee;--o:#e09a52}
+
+/* 淺色交給各頁原本的 CSS（數值相同）；深色用更高權重蓋過頁內寫死色碼 */
+html[data-theme="dark"] body{background:var(--bg);color:var(--fg)}
+
+/* 標頭的主題切換按鈕（客人頁白底標頭用綠底圓鈕；接單頁綠標頭用半透明白） */
+.top .top-r{display:flex;align-items:center;gap:8px}
+.theme-btn{background:var(--g2);border:0;color:var(--g);font-size:18px;line-height:1;min-width:40px;min-height:40px;
+  border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;flex:none}
+header .theme-btn{background:rgba(255,255,255,.18);color:#fff}
+.top .theme-btn{background:var(--g2);color:var(--g)}
+.theme-btn:active{transform:scale(.94)}
+
+/* ===== 骨架畫面（照抄記帳；深色時用 --sk-a / --sk-b，不要一片亮灰）===== */
+.skeleton-wrap{display:block}
+.skeleton{display:block;border-radius:10px;background:linear-gradient(90deg,var(--sk-a) 25%,var(--sk-b) 37%,var(--sk-a) 63%);
+  background-size:400% 100%;animation:sk-shine 1.2s ease-in-out infinite}
+.skeleton.line{height:18px;margin:0 0 12px}.skeleton.line.w60{width:60%}.skeleton.line.w80{width:80%}.skeleton.line.w40{width:40%}
+.skeleton.h1{height:30px;width:45%;margin:8px 0 16px}
+.skeleton.card{height:96px;margin:0 0 12px;border-radius:14px;box-shadow:none;padding:0;border:0!important}
+.skeleton-msg{color:var(--muted);font-size:14px;margin:4px 0 0;text-align:center}
+@keyframes sk-shine{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media (prefers-reduced-motion: reduce){.skeleton{animation:none}}
+.is-loading>*:not(.skeleton-wrap){display:none!important}
+
+/* ===== 深色覆蓋：寫死色碼的區塊 ===== */
+html[data-theme="dark"] header{background:var(--top-bg);color:var(--top-fg);box-shadow:0 1px 6px #0008}
+html[data-theme="dark"] .top b,html[data-theme="dark"] .top a{color:var(--g)}
+html[data-theme="dark"] nav a{background:var(--g2);color:var(--g)}
+html[data-theme="dark"] .card,html[data-theme="dark"] .info,html[data-theme="dark"] .steps div,html[data-theme="dark"] .ymcard{background:var(--card);box-shadow:0 2px 8px #0006}
+html[data-theme="dark"] .note,html[data-theme="dark"] footer,html[data-theme="dark"] .ci p,html[data-theme="dark"] .ci2 .n small{color:var(--muted)}
+html[data-theme="dark"] .noimg{background:var(--g2);color:var(--g)}
+html[data-theme="dark"] .qty button.m{background:#3a403a;color:var(--fg)}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:var(--input-bg);border-color:var(--input-border);color:var(--fg)}
+html[data-theme="dark"] .seg label,html[data-theme="dark"] .seg button{background:var(--input-bg);border-color:var(--g);color:var(--g)}
+html[data-theme="dark"] .seg button.on{background:var(--g);color:#122012}
+html[data-theme="dark"] pre{background:#1a1f1a;color:var(--fg)}
+html[data-theme="dark"] .btn.tel,html[data-theme="dark"] .btn.more{background:var(--card);color:var(--g);border-color:var(--g)}
+html[data-theme="dark"] .qty input.qin{background:var(--input-bg);color:var(--fg);border-color:var(--g)}
+html[data-theme="dark"] .mdl .bx{background:#2a2418;border-color:var(--o);color:var(--fg)}
+html[data-theme="dark"] .mdl p,html[data-theme="dark"] .mdl .ms{color:var(--fg)}
+html[data-theme="dark"] .mdl .gy{background:#3a403a;color:var(--fg)}
+html[data-theme="dark"] .mdl .sm{color:var(--muted)}
+html[data-theme="dark"] #sheet,html[data-theme="dark"] #ysheet,html[data-theme="dark"] .mdl,html[data-theme="dark"] #ed{background:#000a}
+html[data-theme="dark"] #sheet .in,html[data-theme="dark"] #ysheet .in{background:var(--card);color:var(--fg)}
+html[data-theme="dark"] #sheet .hd{background:var(--card);border-bottom-color:var(--line)}
+html[data-theme="dark"] #sheet .x{background:#3a403a;color:var(--fg)}
+html[data-theme="dark"] #sheet .back,html[data-theme="dark"] #ysheet .back{background:var(--g2);color:var(--g)}
+html[data-theme="dark"] .ci2{border-bottom-color:var(--line)}
+html[data-theme="dark"] .ci2 .th{background:#243624;box-shadow:none}
+html[data-theme="dark"] .ci2 .del{background:var(--err-bg)}
+html[data-theme="dark"] .ctot{color:var(--fg)}
+html[data-theme="dark"] nav a.ymnav{background:#3b3112;color:#f5dc8a}
+html[data-theme="dark"] .ymentry{background:#3b3112;border-color:#a07a20;color:#f5dc8a}
+html[data-theme="dark"] .ymentry span{color:#d4c08a}
+html[data-theme="dark"] .ym-prov{background:#3b3112;border-color:#a07a20;color:#f5dc8a}
+html[data-theme="dark"] .ym-scope,html[data-theme="dark"] .ym-err{background:var(--err-bg);color:var(--err-fg)}
+html[data-theme="dark"] .ympic{background:repeating-linear-gradient(45deg,#2a2618,#2a2618 10px,#3b341c 10px,#3b341c 20px);color:#d4c08a}
+html[data-theme="dark"] .ymtag{background:#3b3112;color:#f5dc8a}
+html[data-theme="dark"] .ymprice{color:var(--o)}
+html[data-theme="dark"] .ymsub{border-top-color:var(--line)}
+html[data-theme="dark"] #ymStatus.bad{background:var(--err-bg);color:var(--err-fg)}
+html[data-theme="dark"] #ymStatus.ok,html[data-theme="dark"] .ym-ok{background:var(--ok-bg);color:var(--ok-fg)}
+html[data-theme="dark"] #ymStatus.load{background:var(--warn-bg);color:var(--warn-fg)}
+html[data-theme="dark"] #ybar{background:#3b3112;color:#f5dc8a;border-color:#a07a20}
+html[data-theme="dark"] #bar{background:#2a5628}
+html[data-theme="dark"] #bar button{background:#fff;color:#3f7d3a}
+html[data-theme="dark"] .lim{background:var(--err-bg);color:var(--err-fg)}
+html[data-theme="dark"] #pauseBan{background:var(--warn-bg)!important;border-color:#a07a20!important;color:var(--warn-fg)!important}
+html[data-theme="dark"] .a2hs{background:var(--card);border-color:var(--g);color:var(--fg);box-shadow:0 1px 3px #0006}
+html[data-theme="dark"] .a2hs .a2hs-x{background:var(--g2);color:var(--g)}
+
+/* 接單頁 */
+html[data-theme="dark"] #onTip,html[data-theme="dark"] .empty,html[data-theme="dark"] h2,html[data-theme="dark"] .card .sm,html[data-theme="dark"] .set,html[data-theme="dark"] #goSt,html[data-theme="dark"] .tip{color:var(--muted)}
+html[data-theme="dark"] .card .nt,html[data-theme="dark"] .ym-chip button{background:var(--err-bg);color:var(--err-fg)}
+html[data-theme="dark"] .done{background:var(--card);color:var(--fg)}
+html[data-theme="dark"] #pin{background:var(--bg);color:var(--fg)}
+html[data-theme="dark"] #pin input{background:var(--input-bg);border-color:var(--input-border);color:var(--fg)}
+html[data-theme="dark"] #setBtn,html[data-theme="dark"] .back,html[data-theme="dark"] #viewBtn{background:#fff;color:#3f7d3a}
+html[data-theme="dark"] #printSt.ok{background:var(--ok-bg);color:var(--ok-fg);border-color:#2f6b22}
+html[data-theme="dark"] #printSt.bad{background:var(--err-bg);color:var(--err-fg);border-color:#8a2b20}
+html[data-theme="dark"] .remind,html[data-theme="dark"] #backGo{background:#3b3112;border-color:#a07a20;color:#f5dc8a}
+html[data-theme="dark"] #goView{background:radial-gradient(circle at 50% 42%,#1e3d1c 0,#161816 60%)}
+html[data-theme="dark"] .card.rq{background:#3d1a18!important}
+html[data-theme="dark"] .done.cc{background:#2a2a2a!important;color:var(--muted)}
+html[data-theme="dark"] .done.late{background:#3b3112;box-shadow:0 0 0 3px #a07a20 inset}
+html[data-theme="dark"] .lt{color:#f5dc8a}
+html[data-theme="dark"] body.setmode,html[data-theme="dark"] body.setmode{background:#141614}
+html[data-theme="dark"] body.setmode{background:#141614}
+html[data-theme="dark"] .nav{background:#1c221cee;border-bottom-color:var(--line)}
+html[data-theme="dark"] .nav button{color:var(--g)}
+html[data-theme="dark"] .tabs{background:#2a302a}
+html[data-theme="dark"] .tabs button{background:transparent;color:var(--fg);border-color:var(--g)}
+html[data-theme="dark"] .tabs button.on{background:var(--card);color:var(--g);box-shadow:0 1px 4px #0006}
+html[data-theme="dark"] .grp,html[data-theme="dark"] .row,html[data-theme="dark"] .it,html[data-theme="dark"] .cal{background:var(--card)}
+html[data-theme="dark"] .row{border-bottom-color:var(--line);color:var(--fg)}
+html[data-theme="dark"] .row:active{background:#2a302a}
+html[data-theme="dark"] .gh,.row .sub,.cal .wk,#ePicSt,html[data-theme="dark"] .tip{color:var(--muted)}
+html[data-theme="dark"] .row .th,html[data-theme="dark"] .it img{background:#2a302a}
+html[data-theme="dark"] .sw{background:#3a403a}
+html[data-theme="dark"] #ed .sheet{background:#141614}
+html[data-theme="dark"] #ed .sh,html[data-theme="dark"] #ed .ft{background:#1c221c;border-color:var(--line)}
+html[data-theme="dark"] #ed .sh button{color:var(--g)}
+html[data-theme="dark"] #ed .f,html[data-theme="dark"] #setBody .f{background:var(--card);border-bottom-color:var(--line)}
+html[data-theme="dark"] #ed .f>span{color:var(--fg)}
+html[data-theme="dark"] #ed input[type=text],html[data-theme="dark"] #ed input[type=date],html[data-theme="dark"] #ed textarea,html[data-theme="dark"] #ed select{color:var(--fg);background:transparent}
+html[data-theme="dark"] #ed .prow input{background:#2a302a!important;color:var(--fg)}
+html[data-theme="dark"] #ed .prow button,html[data-theme="dark"] #ymEditor .prow button,html[data-theme="dark"] #ymEditor [data-vrow] button{background:#3a403a;color:var(--fg)}
+html[data-theme="dark"] #ed .pic,html[data-theme="dark"] #ed .mvb button,html[data-theme="dark"] #ed .del{background:var(--card)}
+html[data-theme="dark"] #ed .pic img,html[data-theme="dark"] #ed .pic .nopic,html[data-theme="dark"] #ymEPic,html[data-theme="dark"] #ymEditor .nopic{background:#2a302a;color:var(--muted)}
+html[data-theme="dark"] #ed .pbtn button.g2,html[data-theme="dark"] #ymEditor .pbtn button.g2{background:var(--g2);color:var(--g)}
+html[data-theme="dark"] #setBody .f input,html[data-theme="dark"] #setBody .f select,html[data-theme="dark"] #setBody .f textarea,html[data-theme="dark"] #setBody .ym-in,html[data-theme="dark"] #ymEditor .prow input{background:var(--input-bg);border-color:var(--input-border);color:var(--fg)}
+html[data-theme="dark"] .ym-prov{color:#f5dc8a}
+html[data-theme="dark"] .ym-chip{background:var(--card);border-bottom-color:var(--line);color:var(--fg)}
+html[data-theme="dark"] input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1)}
+
+/* 列印標籤維持白紙黑字，不受深色模式影響 */
+@media print{
+  html[data-theme="dark"] body,html[data-theme="dark"] #labels,.lab{background:#fff!important;color:#000!important}
+}
+
+/* 系統深色、尚未手動選淺色時，與 data-theme=dark 同一套覆蓋（避免先閃白） */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body{background:var(--bg);color:var(--fg)}
+  :root:not([data-theme="light"]) header{background:var(--top-bg);color:var(--top-fg);box-shadow:0 1px 6px #0008}
+  :root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .info,:root:not([data-theme="light"]) .steps div,:root:not([data-theme="light"]) .ymcard,:root:not([data-theme="light"]) .done{background:var(--card)}
+  :root:not([data-theme="light"]) .a2hs{background:var(--card);border-color:var(--g);color:var(--fg)}
+  :root:not([data-theme="light"]) #pin{background:var(--bg);color:var(--fg)}
+  :root:not([data-theme="light"]) input,:root:not([data-theme="light"]) select,:root:not([data-theme="light"]) textarea{background:var(--input-bg);border-color:var(--input-border);color:var(--fg)}
+  :root:not([data-theme="light"]) #printSt.ok{background:var(--ok-bg);color:var(--ok-fg)}
+  :root:not([data-theme="light"]) #printSt.bad{background:var(--err-bg);color:var(--err-fg)}
+}
