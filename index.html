@@ -1,6 +1,6 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="manifest" href="manifest-customer.json"><meta name="theme-color" content="#3f7d3a"><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="蓮緣點餐"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script>
+<link rel="manifest" href="manifest-customer.json"><meta name="theme-color" content="#3f7d3a"><script src="ly-theme.js"></script><link rel="icon" href="icon.png"><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="蓮緣點餐"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script><script src="ly-skeleton.js"></script>
 <title>蓮緣素食餐坊｜台北光復南路純素便當・線上預訂自取</title>
 <meta name="description" content="蓮緣素食餐坊（台北市大安區光復南路410號）純素便當、餐盒、套餐線上預訂，現場自取。電話 02-2703-8823，週一至六 10:00–14:00、16:00–20:00。">
 <link rel="canonical" href="https://yzsueuudpwos-lab.github.io/lianyuan/">
@@ -99,8 +99,10 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 #yearmeal{scroll-margin-top:72px}
 .seg{display:flex;gap:8px;margin:6px 0 4px}.seg button{flex:1;font-size:18px;font-weight:700;padding:14px 4px;border:2px solid var(--g);border-radius:14px;background:#fff;color:var(--g)}.seg button.on{background:var(--g);color:#fff}.seg button:disabled{opacity:.4}
 .mdl .rd{background:#c0392b;color:#fff}.mdl .gy{background:#e5e5e5;color:#333}.mdl .ln{background:#06c755;color:#fff}.mdl .sm{font-size:15px;color:#777}
-</style></head><body>
-<header><div class="top"><b>🪷 蓮緣素食餐坊</b><a href="tel:0227038823">📞 02-2703-8823</a></div>
+</style>
+<link rel="stylesheet" href="ly-theme.css">
+</head><body>
+<header><div class="top"><b>🪷 蓮緣素食餐坊</b><span class="top-r"><button type="button" id="theme-btn" class="theme-btn" aria-label="改成深色模式">🌙</button><a href="tel:0227038823">📞 02-2703-8823</a></span></div>
 <nav><span id="catNav"><a href="#c1">人氣餐盒</a><a href="#c2">套餐</a><a href="#c3">單點</a></span><a class="ymnav" href="#yearmeal">🧧 年菜預覽</a><a href="#how">訂購方式</a><a href="#info">店家資訊</a></nav></header>
 <div class="a2hs" id="a2hs" role="note" hidden><span class="a2hs-t">📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面</span><button type="button" class="a2hs-x" id="a2hs-x" aria-label="關閉提示">✕</button></div>
 <div class="hero"><img src="店家封面.jpg" alt="蓮緣素食"><div><h1>蓮緣素食餐坊</h1><p>純素便當・手工素餃・港式蘿蔔糕｜光復南路410號</p></div></div>
@@ -190,14 +192,20 @@ function render(){const cats=[];M.forEach(m=>{if(!cats.includes(m[0]))cats.push(
  document.getElementById('menuSecs').innerHTML=cats.map((c,j)=>`<section id="${sid(c)}"><h2>${esc(c)}</h2>${CATNOTE[c]?`<p class="note">${CATNOTE[c]}</p>`:''}<div id="L${j}"></div></section>`).join('');
  document.getElementById('catNav').innerHTML=cats.map(c=>`<a href="#${sid(c)}">${esc(c)}</a>`).join('');
 M.forEach((m,i)=>{const so=!!S.soldOut[m[1]],img=imgOf(m),L=m[5].lim?`<span class="lim">🧧 限定 ${md(m[5].from)}–${md(m[5].to)} 取餐</span>`:'';document.getElementById('L'+cats.indexOf(m[0])).insertAdjacentHTML('beforeend',`<div class="card${so?' so':''}">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(m[1])}">`:'<div class="noimg">建置中，等待管理人員建圖</div>'}<div class="ci"><h3>${esc(m[1])}</h3>${L}<p>${esc(m[3])}</p><div class="row"><span class="price">$${m[2]}</span>${so?'<span class="sold">今天賣完・明天起可訂</span>':''}<div class="qty"><button class="m" onclick="chg(${i},-1)">−</button><input class="qin" id="q${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="setQ(${i},this.value,false)" onchange="setQ(${i},this.value,true)" onblur="setQ(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="chg(${i},1)">＋</button></div></div></div></div>`)});try{window.ymOnMenuRender&&window.ymOnMenuRender()}catch(err){}}
-render();
+// 第一次載入菜單：內容區先顯示骨架，資料到了再換真實菜單。之後每 2 分鐘重整不要再蓋骨架（避免閃爍）。
+let lyMenuFirst=true;
+function lyMenuDone(fromNet){
+  render();
+  upd();
+  if(lyMenuFirst){lyMenuFirst=false;if(window.lySkeleton)window.lySkeleton.hideFirst(document.getElementById('menuSecs'))}
+}
 // 讀店家設定（價錢、照片、今天賣完、預訂日曆）；讀不到就用 menu.js 的預設值
 function jsonp(p){return new Promise((res,rej)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement('script');const t=setTimeout(()=>{clean();rej('timeout')},8000);
  function clean(){clearTimeout(t);delete window[cb];sc.remove()}window[cb]=d=>{clean();d&&d.ok?res(d):rej(d&&d.error)};sc.onerror=()=>{clean();rej('net')};
  sc.src=GAS_URL+'?'+new URLSearchParams({...p,callback:cb,_:Date.now()});document.body.appendChild(sc)})}
-function loadS(){if(!GAS_URL)return Promise.resolve();return jsonp({action:'settings'}).then(d=>{S=d;if(Array.isArray(d.menu))setMenu(d.menu);else{S.menu=null;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];if(p>0)m[2]=p})}render();upd();banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{})}
+function loadS(){if(!GAS_URL)return Promise.resolve().then(()=>lyMenuDone(false));return jsonp({action:'settings'}).then(d=>{S=d;if(Array.isArray(d.menu))setMenu(d.menu);else{S.menu=null;M.forEach((m,i)=>{const p=+(d.price||{})[m[1]];if(p>0)m[2]=p})}lyMenuDone(true);banner();if(!S.open&&!window.PM_SHOWN){window.PM_SHOWN=1;document.getElementById('pauseMdl').style.display='flex'}}).catch(()=>{lyMenuDone(false)})}
 banner();setInterval(()=>loadS(),120000);
-loadS();
+if(window.lySkeleton)window.lySkeleton.showFirst(document.getElementById('menuSecs'));loadS();
 function chg(i,d){window.OID=null;window.SID=null;q[i]=Math.min(999,Math.max(0,q[i]+d));document.getElementById('q'+i).value=q[i];upd()}
 // 直接打數字：只留 0–999 的整數，空白算 0；打字中不硬改空白，離開時才補 0
 function setQ(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=Math.min(999,parseInt(d||'0',10));const e=document.getElementById('q'+i);if(fin||e.value!==d)e.value=(!fin&&d==='')?'':String(n);if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;upd()}

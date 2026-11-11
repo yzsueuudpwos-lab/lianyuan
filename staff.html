@@ -1,7 +1,8 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>蓮緣接單</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#3f7d3a">
-<link rel="icon" href="icon.png"><script src="menu.js"></script><script src="yearmeal.js"></script><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script>
+<script src="ly-theme.js"></script>
+<link rel="icon" href="icon.png"><script src="menu.js"></script><script src="yearmeal.js"></script><link rel="apple-touch-icon" href="icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="stylesheet" href="ly-feel.css"><script src="ly-feel.js"></script><script src="ly-skeleton.js"></script>
 <style id="pagecss">@page{size:40mm 30mm;margin:0}.sg{background:#fff3c4;border:1px solid #e0a800;border-radius:8px;font-weight:700}.sgd{color:#4c9e3a;font-size:13px}</style>
 <style>
 body{margin:0;font-family:"Noto Sans TC","PingFang TC",sans-serif;background:#f5f5f0;color:#222;font-size:26px}
@@ -172,10 +173,12 @@ body.phone #goSt{font-size:18px}body.phone #goPeek{font-size:16px}
 #printSt{display:none;border-radius:14px;padding:12px 14px;margin:0 0 12px;font-size:22px;font-weight:700;line-height:1.45}
 #printSt.ok{display:block;background:#e7f6e4;color:#1d6b32;border:2px solid #8fcf86}#printSt.bad{display:block;background:#fdecea;color:#8a2b20;border:2px solid #e6a49b}
 body.phone #printSt{font-size:17px}
-</style></head><body><div class="a2hs" id="a2hs" role="note" hidden><span class="a2hs-t">📲 把接單加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面</span><button type="button" class="a2hs-x" id="a2hs-x" aria-label="關閉提示">✕</button></div><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
+</style>
+<link rel="stylesheet" href="ly-theme.css">
+</head><body><div class="a2hs" id="a2hs" role="note" hidden><span class="a2hs-t">📲 把接單加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面</span><button type="button" class="a2hs-x" id="a2hs-x" aria-label="關閉提示">✕</button></div><div id="sndBan" onclick="unlockAudio();ding()">🔔 點一下開啟提示聲</div>
 <div id="pin"><div style="font-size:40px;font-weight:700">蓮緣素食 接單</div><div>請輸入店員密碼</div>
 <input id="pinIn" type="password" inputmode="numeric" autocomplete="off"><button onclick="savePin()">開始接單</button><div id="pinErr" style="color:#c00"></div></div>
-<header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button id="viewBtn" onclick="setView(!document.body.classList.contains('phone'))">💻 平板版</button><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
+<header><b>🪷 蓮緣接單</b><span id="stat">今天：0 份｜$0</span><span id="quota"></span><span id="conn">連線中…</span><button type="button" id="theme-btn" class="theme-btn" aria-label="改成深色模式">🌙</button><button id="viewBtn" onclick="setView(!document.body.classList.contains('phone'))">💻 平板版</button><button id="setBtn" onclick="showSet(!document.body.classList.contains('setmode'))">⚙ 店家設定</button></header>
 <main>
 <div id="goView"><div style="font-size:30px;font-weight:700;color:#3f7d3a">🥬🍱 蓮緣素食 🥕</div><button id="goBtn" onclick="goOnline()">上線<small>🌱</small></button><div id="goSt"><b>● 目前暫停接單</b><br>按大圓圈開始接今天的單</div><button id="goPeek" onclick="document.body.classList.add('peek')">先看訂單（不上線）</button></div><button id="backGo" onclick="document.body.classList.remove('peek')">← 回到上線畫面</button><button id="onBtn" class="off" onclick="toggleOnline()">🔴 暫停接單（按這裡上線）</button><div id="onTip">今天還沒上線，客人只能預訂明天以後</div>
 <div id="printSt" role="status" aria-live="polite"></div><div id="manual"></div>
@@ -286,7 +289,7 @@ async function toggleOnline(){const want=!ONLINE.open;
  .catch(e=>say('請再按一次：'+e)).finally(()=>$('onBtn').disabled=false)}
 function quota(){api({action:'quota'}).then(q=>{$('quota').textContent=q.enabled===false?'':q.limit?`LINE 本月 ${q.used}/${q.limit} 則`:(q.used!=null?`LINE 本月 ${q.used} 則`:'')}).catch(()=>{})}
 setInterval(sndBan,3000);
-function poll(){if(window.YM_PREVIEW||!PIN||!GAS_URL)return;api({action:'list'}).then(render).catch(e=>{if(e=='pin'){localStorage.removeItem('ly_pin');location.reload()}$('conn').textContent='⚠ '+e})}
+function poll(){if(window.YM_PREVIEW||!PIN||!GAS_URL)return;/* 骨架只在第一次載入訂單時 show，之後 poll 不重畫骨架 */if(window.lySkeleton)window.lySkeleton.showFirst($('list'));api({action:'list'}).then(d=>{render(d);if(window.lySkeleton)window.lySkeleton.hideFirst($('list'))}).catch(e=>{if(e=='pin'){localStorage.removeItem('ly_pin');location.reload()}$('conn').textContent='⚠ '+e;if(window.lySkeleton)window.lySkeleton.hideFirst($('list'))})}
 function start(){wake();poll();setInterval(poll,POLL);quota();setInterval(quota,600000)}
 function find(id){return data.pending.concat(data.done).find(o=>o.id==id)}
 async function act(id,st){ack(id);const o=find(id);if(!o)return;const lab=st;if(st=='同意取消')st='取消';
