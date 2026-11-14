@@ -113,6 +113,9 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 .tot-break .r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:18px;margin:4px 0}
 .tot-break .r.grand{font-size:22px;font-weight:800;color:var(--g);margin-top:8px;padding-top:8px;border-top:2px solid var(--g)}
 #methodSeg button{min-height:56px;font-size:20px}
+/* 20261115 記住這支手機上的資料 */
+#lyRememberBar{margin:8px 0 4px;font-size:13px;font-weight:600;color:#666}
+#lyRememberBar a{color:var(--g);font-weight:800;text-decoration:underline;padding:8px 0;display:inline-block}
 
 </style>
 <link rel="stylesheet" href="ly-theme.css">
@@ -155,6 +158,7 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <button class="btn more" onclick="closeSheet()">＋ 繼續選購（回菜單）</button>
 <label>姓名</label><input id="nm" name="name" autocomplete="name">
 <label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
+<p class="note" id="lyRememberBar">資料只存在這支手機</p>
 <label>取餐方式</label>
 <div class="seg" id="methodSeg" role="group" aria-label="取餐方式">
 <button type="button" id="mPickup" class="on" onclick="setMethod('pickup')">🏪 自取</button>
@@ -309,7 +313,7 @@ function setMode(){const n=cnt(),pre=isPre(),box=document.getElementById('preBox
  preTimes()}
 function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
  addDay(sel,day,`${m}/${dd}（${WK[day.getDay()]}）`,null)}
-['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});if(window.lyInitDeliveryFields)lyInitDeliveryFields();
+if(window.lyInitRemember)setTimeout(lyInitRemember,0);else if(window.lyInitDeliveryFields)lyInitDeliveryFields();
 function tmOk(){if(!document.getElementById('tm').value){lyHaptic('error');alert(isPre()?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
 function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){lyHaptic('error');alert('請填姓名和電話');return false}if(window.lyOkDelivery&&!lyOkDelivery())return false;return true}
 function review(){const r=document.getElementById('review');if(!r)return;const v=id=>(document.getElementById(id)||{}).value||'',tm=document.getElementById('tm'),pd=document.getElementById('pd'),pre=isPre();
@@ -333,6 +337,7 @@ async function lineShare(){if(sending||!ok())return false;const b=document.getEl
  window.PREERR='';try{if(!window.SID)await sendGas()}finally{sending=false;b.textContent=old;b.style.opacity='';lyScan()}
  if(window.PREERR){lyHaptic('error');alert({late:'已經過了這個數量的預訂截止時間，請選晚一點的日子',off:'店家這天不接預訂，請換一天',full:'這天的預訂已經額滿，請換一天',far:'只能預訂 30 天內',soldout:'有餐點今天已賣完，請改選明天以後',paused:'店裡現在暫停接今日訂單，請改選明天以後取餐 🙏',date:'請選預訂日期'}[window.PREERR]||'無法預訂，請打電話 02-2703-8823');loadS().then(setMode);return false}
  if(cnt()>=PRE_MIN&&window.DEP!==undefined)alert(window.DEP?'💰 這是你第一次訂大單，需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家會跟你聯絡。\n取餐前兩天以前取消，訂金全額退還；前一天才取消不退。':'🙏 你是老客人，這次大單免訂金！\n如要取消，請提早告訴店家。');
+ if(window.lySaveRemember)lySaveRemember();
  lyHaptic('success');
  if(window.CT){showOk();return false}
  location.href=lineUrl(txt());return false}

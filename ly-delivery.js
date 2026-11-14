@@ -1,4 +1,5 @@
 /* 20261114 蓮緣便當外送費預估（Lalamove）
+   20261115 成功送出後記住姓名／電話／取餐方式／外送地址（只存在這支手機）
    - 客人填地址 → 呼叫後端 GAS action=lalamoveQuote（金鑰只在 Apps Script 指令碼屬性，網頁沒有任何金鑰）
    - 估不到（後端還沒接上、地址找不到、Lalamove 沒回）→ 顯示「暫時無法估算，店家會用電話告知外送費」，訂單照樣可以送出
    - 外送資訊同時寫進送給後端的備註（【外送】開頭），舊版後端也看得到地址
@@ -279,16 +280,74 @@
 
   document.addEventListener('input', function (e) {
     if (!e.target) return;
-    if (e.target.id === 'dlAddr' || e.target.id === 'dlFloor') {
-      try { localStorage.setItem('ly_' + e.target.id, e.target.value); } catch (err) {}
-      scheduleQuote();
-    }
+    if (e.target.id === 'dlAddr' || e.target.id === 'dlFloor') scheduleQuote();
   });
 
-  w.lyInitDeliveryFields = function () {
-    ['dlAddr', 'dlFloor'].forEach(function (k) {
-      var e = $(k); if (!e) return;
-      try { if (!e.value) e.value = localStorage.getItem('ly_' + k) || ''; } catch (err) {}
-    });
-  };
+  /* 20261115 成功送出後，把姓名、電話、取餐方式、外送地址記在這支手機；不清年菜欄位。 */
+  function remGet() {
+    try {
+      return {
+        name: localStorage.getItem('ly_nm') || '',
+        phone: localStorage.getItem('ly_ph') || '',
+        method: localStorage.getItem('ly_method') || '',
+        address: localStorage.getItem('ly_dlAddr') || '',
+        floor: localStorage.getItem('ly_dlFloor') || ''
+      };
+    } catch (err) {
+      return { name: '', phone: '', method: '', address: '', floor: '' };
+    }
+  }
+  function remHas(r) {
+    r = r || remGet();
+    return !!(r.name || r.phone || r.address || r.floor || r.method === 'delivery');
+  }
+  function paintRememberBar() {
+    var bar = $('lyRememberBar'); if (!bar) return;
+    var r = remGet();
+    var link = remHas(r) ? '　<a href="#clear" id="lyRememberClear">' + (r.name ? '不是你？清除' : '清除我的資料') + '</a>' : '';
+    bar.innerHTML = '資料只存在這支手機' + link;
+  }
+  function lySaveRemember() {
+    try {
+      var nm = val('nm'), ph = val('ph');
+      if (nm) localStorage.setItem('ly_nm', nm);
+      if (ph) localStorage.setItem('ly_ph', ph);
+      localStorage.setItem('ly_method', isDelivery() ? 'delivery' : 'pickup');
+      if (isDelivery()) {
+        localStorage.setItem('ly_dlAddr', val('dlAddr'));
+        localStorage.setItem('ly_dlFloor', val('dlFloor'));
+      }
+    } catch (err) {}
+    paintRememberBar();
+  }
+  function lyClearRemember(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    try {
+      ['ly_nm', 'ly_ph', 'ly_method', 'ly_dlAddr', 'ly_dlFloor'].forEach(function (k) { localStorage.removeItem(k); });
+    } catch (err) {}
+    ['nm', 'ph', 'dlAddr', 'dlFloor'].forEach(function (id) { var e = $(id); if (e) e.value = ''; });
+    setMethod('pickup');
+    paintRememberBar();
+    haptic('light');
+    if (typeof review === 'function') review();
+  }
+  function lyInitRemember() {
+    var r = remGet();
+    var nm = $('nm'), ph = $('ph'), ad = $('dlAddr'), fl = $('dlFloor');
+    if (nm && !nm.value) nm.value = r.name || '';
+    if (ph && !ph.value) ph.value = r.phone || '';
+    if (ad && !ad.value) ad.value = r.address || '';
+    if (fl && !fl.value) fl.value = r.floor || '';
+    paintRememberBar();
+    setMethod(r.method === 'delivery' ? 'delivery' : 'pickup');
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest && e.target.closest('#lyRememberClear');
+    if (t) lyClearRemember(e);
+  });
+
+  w.lyInitDeliveryFields = lyInitRemember;
+  w.lyInitRemember = lyInitRemember;
+  w.lySaveRemember = lySaveRemember;
+  w.lyClearRemember = lyClearRemember;
 })(window);
