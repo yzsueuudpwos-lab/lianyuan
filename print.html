@@ -44,16 +44,16 @@ let L=[];
 function parse(t){const o={items:[]};t.split(/\n/).forEach(r=>{r=r.trim();let m;
  if(m=r.match(/^(.+?)\s*[xX×＊*]\s*(\d+)/))o.items.push({n:m[1].trim(),q:+m[2]});
  else if(m=r.match(/^姓名[:：]\s*(.*)/))o.name=m[1];else if(m=r.match(/^電話[:：]\s*(.*)/))o.phone=m[1].replace(/\D/g,'');
- else if(m=r.match(/^時間[:：]\s*(.*)/))o.time=m[1];else if(m=r.match(/^備註[:：]\s*(.*)/))o.note=m[1];});return o}
+ else if(m=r.match(/^時間[:：]\s*(.*)/))o.time=m[1];else if(m=r.match(/^備註[:：]\s*(.*)/))o.note=m[1];else if(m=r.match(/^方式[:：]\s*(.*)/))o.method=m[1];else if(m=r.match(/^地址[:：]\s*(.*)/))o.address=m[1];else if(m=r.match(/^樓層[/／]?.*[:：]\s*(.*)/))o.floor=m[1];else if(m=r.match(/^外送費預估[:：]\s*(.*)/))o.deliveryFee=m[1];});return o}
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
 function make(){const o=parse(document.getElementById('src').value);const e=document.getElementById('err');
  let it=o.items;if(document.getElementById('skip').checked)it=it.filter(i=>!SIDE.includes(i.n));
  if(!it.length){e.textContent='看不到品項，格式要像「套餐B x1」';return}e.textContent=o.name?'':'⚠ 沒有姓名';
  L=[];it.forEach(i=>{for(let k=0;k<i.q;k++)L.push({...o,item:i.n})});const N=L.length;L.forEach((l,k)=>l.no=`${k+1}/共${N}`);
- const tm=(o.time||'').replace(/^\d{4}-/,'');
+ const tm=(o.time||'').replace(/^\d{4}-/,'');const dl=/外送/.test(o.method||'')||!!o.address;const dest=dl?[o.address,o.floor].filter(Boolean).join(' ')||tm:tm;
  document.getElementById('labels').innerHTML=L.map(l=>`<div class="lab"><div class="h"><span>${SHOP}</span><span>${l.no}</span></div>
  <div class="n">${esc(l.name||'')}　${l.phone?'#'+l.phone.slice(-3):''}</div><div class="i">${esc(l.item)}</div>
- <div class="t">取餐 ${esc(tm)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('')}
+ <div class="t">${dl?'外送 ':'取餐 '}${esc(dest)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('')}
 function setSize(){const w=document.getElementById('size').value=='58';document.body.classList.toggle('w58',w);
  document.getElementById('pagecss').textContent=w?'@page{size:58mm 40mm;margin:0}':'@page{size:40mm 30mm;margin:0}'}
 // 畫成點陣圖（8 dots/mm = 203dpi）
@@ -63,7 +63,7 @@ function draw(l){const w=document.getElementById('size').value=='58';const W=w?4
  g.font=F(22);g.fillText(SHOP,12*f,30*f);g.textAlign='right';g.fillText(l.no,W-12*f,30*f);g.textAlign='left';g.fillRect(12*f,38*f,W-24*f,2);
  g.font='bold '+F(36);g.fillText(`${l.name||''} ${l.phone?'#'+l.phone.slice(-3):''}`,12*f,82*f);
  g.font='bold '+F(30);g.fillText(l.item,12*f,128*f,W-24*f);
- g.font=F(24);g.fillText('取餐 '+(l.time||'').replace(/^\d{4}-/,''),12*f,175*f);
+ g.font=F(24);const dl=/外送/.test(l.method||'')||!!l.address;g.fillText((dl?'外送 ':'取餐 ')+(dl?([l.address,l.floor].filter(Boolean).join(' ')||(l.time||'')):(l.time||'').replace(/^\d{4}-/,'')),12*f,175*f);
  if(l.note){g.font=F(22);g.fillText('備註：'+l.note,12*f,215*f,W-24*f)}return c}
 async function saveImg(){if(!L.length)make();for(const [k,l] of L.entries()){const a=document.createElement('a');a.download=`標籤_${l.name||''}_${k+1}.png`;a.href=draw(l).toDataURL();a.click();await new Promise(r=>setTimeout(r,300))}}
 // ESC/POS 點陣列印 GS v 0

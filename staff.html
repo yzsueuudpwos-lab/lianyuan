@@ -123,7 +123,7 @@ body.phone #onBtn{font-size:24px;padding:16px 8px;border-width:4px;border-radius
 body.phone #onTip{font-size:16px;margin-bottom:10px}
 body.phone .card{padding:14px;border-left-width:8px;border-radius:16px;margin-bottom:14px}
 body.phone .card .who{font-size:26px}body.phone .card .tm{font-size:20px}body.phone .card pre{font-size:24px}
-body.phone .card .sm{font-size:15px}body.phone .card .nt{font-size:19px}
+body.phone .card .sm{font-size:15px}body.phone .card .nt{font-size:19px}.card .dl{font-size:26px;font-weight:700;background:#eaf3e6;border-radius:10px;padding:8px 10px;margin:6px 0;color:#1d4d1a;line-height:1.45}body.phone .card .dl{font-size:18px}
 body.phone .btns{flex-direction:column;gap:10px}body.phone .btns button{font-size:26px;padding:20px 8px;min-height:68px}
 body.phone .manual{font-size:20px}body.phone h2{font-size:20px}
 body.phone .done{font-size:16px;flex-direction:column;align-items:stretch}body.phone .done button{font-size:18px;padding:12px 16px;min-height:44px}
@@ -257,7 +257,16 @@ function ding(){window.__beeps++;sndBan();try{AC=AC||new (window.AudioContext||w
 async function wake(){try{if(navigator.wakeLock)await navigator.wakeLock.request('screen')}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){wake();poll()}});
 function parseItems(s){return String(s).split('\n').map(l=>{const m=l.match(/^(.+?)\s*x(\d+)\s*$/);return m?{n:m[1].trim(),q:+m[2]}:null}).filter(Boolean)}
-function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent=`今天：${d.count} 份｜$${d.total}`;$('conn').textContent='✅ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+/* 20261114 外送：客人頁把外送資訊放在備註最前面（【外送】地址：…｜外送費預估 $N｜備註：…），這裡拆回來 */
+function normDl(o){if(!o||o._dl)return o;o._dl=1;const s=String(o.note||'');if(!/^【外送】/.test(s))return o;
+ let body=s.slice(4),un='';const k=body.indexOf('｜備註：');if(k>=0){un=body.slice(k+4);body=body.slice(0,k)}
+ o.method='delivery';o.note=un;o.feeKnown=false;body.split('｜').forEach(p=>{let m;if(m=p.match(/^地址：([\s\S]*)/))o.address=o.address||m[1];else if(m=p.match(/^外送費預估 \$(\d+)/)){o.deliveryFee=+m[1];o.feeKnown=true}});
+ if(o.feeKnown)o.subtotal=(+o.total||0)-o.deliveryFee;else o.subtotal=+o.total||0;return o}
+function isDl(o){return o&&(o.method==='delivery'||!!String(o.address||'').trim())}
+function dlBlock(o){if(!isDl(o))return '';return `<div class="dl">🛵 外送（Lalamove）<br>📍 ${esc([o.address,o.floor].filter(Boolean).join('，'))}${o.feeKnown===false?'<br>⚠ 外送費沒估到，請打電話告訴客人':''}</div>`}
+function totLine(o){if(!isDl(o))return '合計 $'+o.total;if(o.feeKnown===false)return `便當小計 $${o.subtotal}｜外送費：請電話告知客人（實際以 Lalamove 叫車金額為準）`;const fee=+o.deliveryFee||0,sub=isFinite(+o.subtotal)?+o.subtotal:(+o.total||0)-fee;return `便當小計 $${sub}｜外送費預估 $${fee}（實際以 Lalamove 叫車金額為準，多退少補）｜預估總額 $${o.total}`}
+function render(d){(d.pending||[]).forEach(normDl);(d.done||[]).forEach(normDl);data=d;if(d.online)showOnline(d.online);$('stat').textContent=`今天：${d.count} 份｜$${d.total}`;$('conn').textContent='✅ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
  const ids=d.pending.map(o=>o.id+'|'+o.status),now=new Set(d.pending.map(o=>String(o.id)));
  [...ALRT].forEach(i=>{if(!now.has(i))ALRT.delete(i)}); // 已經不在待處理就不用再響
  const nu=d.pending.filter(o=>!(seen&&seen.has(o.id+'|'+o.status)));nu.forEach(o=>ALRT.add(String(o.id)));
@@ -266,12 +275,12 @@ function render(d){data=d;if(d.online)showOnline(d.online);$('stat').textContent
  const cc=d.done.filter(o=>o.status=='客人已取消').map(o=>o.id);if(seenCC){const nw=d.done.find(o=>o.status=='客人已取消'&&!seenCC.has(o.id));if(nw){ding();toast('🙅 '+nw.name+' 自己取消了訂單（不用做）')}}seenCC=new Set(cc);
  document.title=(ids.length?`(${ids.length}) `:'')+'蓮緣接單';
  $('list').innerHTML=d.pending.length?d.pending.map(o=>`<div class="card${o.status=='申請取消'?' rq':''}${ALRT.has(String(o.id))?' ring':''}" onclick="ack('${esc(o.id)}');this.classList.remove('ring')">${o.status=='申請取消'?'<div class="rqh">🙋 客人申請取消（這張已接單）</div>':''}<div class="who">${esc(o.name)}　<span class="sm">${esc(o.phone)}</span></div>
- <div class="tm">${o.pre?'📅【預訂單】'+(o.deposit?'<b style="color:#c0392b">💰要收 30% 訂金（第一次訂大單）</b> ':(parseItems(o.items).reduce((t,i)=>t+i.q,0)>=30?'<b style="color:#2e7d32">老客人免訂金</b> ':'')):''}取餐 ${esc(o.pickup)}</div><pre>${esc(o.items)}</pre>${o.note?`<div class="nt">備註：${esc(o.note)}</div>`:''}
- <div class="sm">合計 $${o.total}｜編號 ${esc(o.id)}｜${esc(String(o.time).slice(11,16))} 下單｜${o.line?'LINE 已連上 ✅':'LINE 還沒收到客人訊息'}</div>
+ <div class="tm">${o.pre?'📅【預訂單】'+(o.deposit?'<b style="color:#c0392b">💰要收 30% 訂金（第一次訂大單）</b> ':(parseItems(o.items).reduce((t,i)=>t+i.q,0)>=30?'<b style="color:#2e7d32">老客人免訂金</b> ':'')):''}${isDl(o)?'希望送達 ':'取餐 '}${esc(o.pickup)}</div>${dlBlock(o)}<pre>${esc(o.items)}</pre>${o.note?`<div class="nt">備註：${esc(o.note)}</div>`:''}
+ <div class="sm">${totLine(o)}｜編號 ${esc(o.id)}｜${esc(String(o.time).slice(11,16))} 下單｜${o.line?'LINE 已連上 ✅':'LINE 還沒收到客人訊息'}</div>
  <div class="btns">${o.status=='申請取消'?`<button class="yes" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','同意取消')">🗑️ 同意取消</button>
  <button class="keep" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','不同意取消')">🍳 已經在做了，不能取消</button>`:`<button class="ok" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','已接單')">✅ 接單並列印</button>
  <button class="no" ${busy[o.id]?'disabled':''} onclick="act('${esc(o.id)}','售完')">❌ 售完</button>`}</div></div>`).join(''):'<div class="empty">等待新訂單…</div>';
- $('done').innerHTML=d.done.map(o=>`<div class="done${o.status=='客人已取消'?' cc':''}${o.late?' late':''}"><span>${{'已接單':'✅','售完':'❌','取消':'🚫','客人已取消':'🙅'}[o.status]||''} ${o.status=='客人已取消'?'<span class="cct">客人已取消・不用做</span>':esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜$${o.total}
+ $('done').innerHTML=d.done.map(o=>`<div class="done${o.status=='客人已取消'?' cc':''}${o.late?' late':''}"><span>${{'已接單':'✅','售完':'❌','取消':'🚫','客人已取消':'🙅'}[o.status]||''} ${o.status=='客人已取消'?'<span class="cct">客人已取消・不用做</span>':esc(o.status)}｜${esc(o.name)}｜${esc(String(o.items).replace(/\n/g,'、'))}｜${isDl(o)?'🛵外送 ':''}$${o.total}
  ${o.status=='客人已取消'?'':String(o.reply).startsWith('✅')?'<span class="lok">已自動回覆 LINE ✅</span>':`<span class="lno">請手動回覆${why(o.reply)?'（'+esc(why(o.reply))+'）':''}</span>`}</span>
  <span>${o.status=='已接單'?`${o.late?`<b class="lt">⏰ 過了取餐時間 ${esc(slotTxt(o.pickup))}</b>`:''}${o.stage=='picked'?'<b class="sgd">👋 已取貨 ✔</b> ':`<button class="sg big${o.stage=='ready'?' r':''}" onclick="stgNext('${esc(o.id)}')">${o.stage=='ready'?'👋 已取貨':'🍱 做好了'}</button> `}<button onclick="reprint('${esc(o.id)}')">補印</button> <button class="cx" onclick="act('${esc(o.id)}','取消')">🚫 取消</button>`:''}</span></div>`).join('')||'<div class="sm">還沒有</div>';
  $('manual').innerHTML=Object.keys(manualMsg).map(id=>`<div class="manual">⚠ 請手動在 LINE 回覆客人：${esc(manualMsg[id])}${manualWhy[id]?`<div style="font-size:22px;font-weight:400;margin-top:4px">原因：${esc(manualWhy[id])}</div>`:''}<button class="big" style="font-size:24px;padding:8px 20px;background:#fff;color:#c05800" onclick="delete manualMsg['${esc(id)}'];render(data)">我回好了</button></div>`).join('');lyScan()}
@@ -304,8 +313,8 @@ async function act(id,st){ack(id);const o=find(id);if(!o)return;const lab=st;if(
  .catch(e=>{delete busy[id];render(data);say('請再按一次：'+e)})}
 function reprint(id){const o=find(id);if(o){printOrder(o);onPrinted(id)}}
 // ---- 標籤（與 print.html 相同版面）----
-function labelsOf(o){let it=parseItems(o.items);if($('skip').checked)it=it.filter(i=>!SIDE.includes(i.n));const L=[];
- it.forEach(i=>{for(let k=0;k<i.q;k++)L.push({name:o.name,phone:String(o.phone||'').replace(/\D/g,''),time:o.pickup,note:o.note,item:i.n})});
+function labelsOf(o){let it=parseItems(o.items);if($('skip').checked)it=it.filter(i=>!SIDE.includes(i.n));const L=[];const dl=isDl(o),addr=[o.address,o.floor].filter(Boolean).join('，');
+ it.forEach(i=>{for(let k=0;k<i.q;k++)L.push({name:o.name,phone:String(o.phone||'').replace(/\D/g,''),time:o.pickup,note:o.note,item:i.n,method:dl?'delivery':'pickup',address:addr})});
  L.forEach((l,k)=>l.no=`${k+1}/共${L.length}`);return L}
 function setSize(){const w=$('size').value=='58';localStorage.ly_size=$('size').value;document.body.classList.toggle('w58',w);$('pagecss').textContent=w?'@page{size:58mm 40mm;margin:0}':'@page{size:40mm 30mm;margin:0}'}
 function draw(l){const w=$('size').value=='58';const W=w?464:320,H=w?320:240,f=W/320;
@@ -314,7 +323,7 @@ function draw(l){const w=$('size').value=='58';const W=w?464:320,H=w?320:240,f=W
  g.font=F(22);g.fillText(SHOP,12*f,30*f);g.textAlign='right';g.fillText(l.no,W-12*f,30*f);g.textAlign='left';g.fillRect(12*f,38*f,W-24*f,2);
  g.font='bold '+F(36);g.fillText(`${l.name||''} ${l.phone?'#'+l.phone.slice(-3):''}`,12*f,82*f,W-24*f);
  g.font='bold '+F(30);g.fillText(l.item,12*f,128*f,W-24*f);
- g.font=F(24);g.fillText('取餐 '+(l.time||''),12*f,175*f,W-24*f);
+ g.font=F(24);g.fillText((l.method==='delivery'?'外送 ':'取餐 ')+(l.method==='delivery'?(l.address||l.time||''):(l.time||'')),12*f,175*f,W-24*f);
  if(l.note){g.font=F(22);g.fillText('備註：'+l.note,12*f,215*f,W-24*f)}return c}
 // ESC/POS：ESC @ + GS v 0 點陣圖，每張後走紙
 function raster(c){const g=c.getContext('2d'),W=c.width,H=c.height,d=g.getImageData(0,0,W,H).data,bw=W/8;
@@ -333,7 +342,7 @@ function printOrder(o){const L=labelsOf(o);if(!L.length)return printSay('沒有�
  if(m=='rawbt'&&/Android/i.test(navigator.userAgent)){let bytes=[0x1b,0x40];L.forEach(l=>bytes=bytes.concat(raster(draw(l))));location.href=rawbtUrl(bytes);return printSay('已送到 RawBT 列印。如果沒有印出來，請按「補印」。',true)}
  $('labels').innerHTML=L.map(l=>`<div class="lab"><div class="h"><span>${SHOP}</span><span>${l.no}</span></div>
  <div class="n">${esc(l.name)}　${l.phone?'#'+l.phone.slice(-3):''}</div><div class="i">${esc(l.item)}</div>
- <div class="t">取餐 ${esc(l.time)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('');setTimeout(()=>window.print(),50);return printSay('已開啟系統列印。如果沒有印出來，請按「補印」。',true)}
+ <div class="t">${l.method==='delivery'?'外送 '+esc(l.address||l.time||''):'取餐 '+esc(l.time)}</div><div class="x">${l.note?'備註：'+esc(l.note):''}</div></div>`).join('');setTimeout(()=>window.print(),50);return printSay('已開啟系統列印。如果沒有印出來，請按「補印」。',true)}
 function testPrint(){printOrder({name:'測試',phone:'0912345678',pickup:'今天 下午 4:30',items:'測試便當 x1',note:''})}
 // ===== ⚙ 店家設定（存到 Google 表格「設定」，客人網頁會即時讀取）=====
 let ST=null,curTab='menu',newPrice={},picFor='';

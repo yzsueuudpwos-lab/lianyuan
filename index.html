@@ -99,6 +99,21 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 #yearmeal{scroll-margin-top:72px}
 .seg{display:flex;gap:8px;margin:6px 0 4px}.seg button{flex:1;font-size:18px;font-weight:700;padding:14px 4px;border:2px solid var(--g);border-radius:14px;background:#fff;color:var(--g)}.seg button.on{background:var(--g);color:#fff}.seg button:disabled{opacity:.4}
 .mdl .rd{background:#c0392b;color:#fff}.mdl .gy{background:#e5e5e5;color:#333}.mdl .ln{background:#06c755;color:#fff}.mdl .sm{font-size:15px;color:#777}
+/* 20261114 外送費預估（Lalamove） */
+#dlBox{background:#eaf3e6;border:2px solid #9c9;border-radius:14px;padding:12px 14px;margin:8px 0 4px}
+#dlBox .note{color:#2b2b2b;font-size:15px;font-weight:700}
+#dlQuoteBtn{background:var(--g);color:#fff;font-size:20px;padding:16px;min-height:56px;margin-top:10px}
+#dlFee{margin-top:10px;border-radius:12px;padding:12px 14px;font-size:17px;line-height:1.6;font-weight:700;display:none}
+#dlFee.show{display:block}
+#dlFee.ok{background:#e7f6e4;color:#1d6b32;border:2px solid #8fcf86}
+#dlFee.load{background:#fff6d8;color:#6a4a00;border:2px solid #e0a800}
+#dlFee.bad{background:#fdecea;color:#8a1f12;border:2px solid #e6a49b}
+.fee-amt{font-size:26px;font-weight:800;color:var(--o);display:block;margin:4px 0}
+.tot-break{margin:10px 0 4px;padding:12px 4px 4px;border-top:2px dashed #9c9}
+.tot-break .r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:18px;margin:4px 0}
+.tot-break .r.grand{font-size:22px;font-weight:800;color:var(--g);margin-top:8px;padding-top:8px;border-top:2px solid var(--g)}
+#methodSeg button{min-height:56px;font-size:20px}
+
 </style>
 <link rel="stylesheet" href="ly-theme.css">
 </head><body>
@@ -112,7 +127,7 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <section id="how"><h2>訂購方式</h2><p class="note">選好餐點 → 填資料 → 用 LINE 或電話送出</p>
 <div class="steps"><div><b>1</b>選餐點</div><div><b>2</b>填姓名電話</div><div><b>3</b>送出訂單</div><div><b>4</b>店家回覆「收到」</div></div>
 <p class="note" style="margin-top:10px;color:#c8702a;font-weight:700">⏰ 中午最多人訂，請提早預訂！晚上 19:30 後不接便當訂單</p>
-<p class="note">🏪 目前只提供現場取餐</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
+<p class="note">🏪 可現場自取，也可以選 Lalamove 外送。外送費先顯示預估，結帳時直接加進總額；實際以叫車金額為準，多退少補。</p><p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <p class="note">📅 <b>30 個以上請預訂</b>：取餐<b>前一天</b>下午 3 點前訂，最多可訂 30 天內；30 個以下當天現做也可以。<b>第一次訂大單需付 30% 訂金，訂過的老客人免訂金</b>（送出後會告訴你要不要付）。<b>取餐前兩天</b>以前取消才退訂金；前一天才取消不退（菜已經買好了）。</p></section>
 
 <div id="menuSecs"></div>
@@ -140,10 +155,23 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <button class="btn more" onclick="closeSheet()">＋ 繼續選購（回菜單）</button>
 <label>姓名</label><input id="nm" name="name" autocomplete="name">
 <label>電話</label><input id="ph" name="tel" type="tel" autocomplete="tel">
-<label>取餐方式</label><div class="info" style="background:#eaf3e6">🏪 目前只提供現場取餐</div>
+<label>取餐方式</label>
+<div class="seg" id="methodSeg" role="group" aria-label="取餐方式">
+<button type="button" id="mPickup" class="on" onclick="setMethod('pickup')">🏪 自取</button>
+<button type="button" id="mDelivery" onclick="setMethod('delivery')">🛵 外送（Lalamove）</button>
+</div>
+<div id="dlBox" style="display:none">
+<p class="note">由店家叫 Lalamove 送到你填的地址。先看預估費用，實際以叫車金額為準，多退少補。</p>
+<label for="dlAddr">外送地址</label>
+<input id="dlAddr" name="address" autocomplete="street-address" placeholder="例如：台北市大安區信義路四段1號">
+<label for="dlFloor">樓層／門牌備註（選填）</label>
+<input id="dlFloor" name="floor" autocomplete="off" placeholder="例如：3樓、公司門口左邊">
+<button type="button" class="btn" id="dlQuoteBtn" onclick="lyRequestQuote()">查詢預估外送費</button>
+<div id="dlFee" role="status"></div>
+</div>
 <div id="modeBox"><label>什麼時候取？</label><div class="seg"><button id="mToday" onclick="setPM(false)">🏃 今天現場取</button><button id="mPre" onclick="setPM(true)">📅 預訂別天</button></div></div><div id="preBox" style="display:none"><div class="info" id="preRule" style="background:#fff3e6;font-size:14px;line-height:1.6"></div>
 <label>預訂日期</label><select id="pd" onchange="preTimes()" style="width:100%;font-size:17px;padding:10px;border-radius:10px"></select></div>
-<label>取餐時間</label><select id="tm" style="width:100%;font-size:20px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="offHint" style="display:none;color:#c0392b;font-weight:700">店裡暫停接今日訂單，請選明天以後取餐 🙏</p><p class="note" id="limHint" style="display:none;color:#c0392b;font-weight:700;font-size:16px">🧧 有限定期間的餐點，只能選限定的日子取餐</p><p class="note" id="tmHint">上午 10:30–下午 1:50、下午 4:30–7:50，每 10 分鐘一個時段，下單後最快 10 分鐘可取；週日休息</p>
+<label id="tmLabel">取餐時間</label><select id="tm" style="width:100%;font-size:20px;padding:10px;border-radius:10px"></select><p class="note" id="soHint" style="display:none;color:#c0392b;font-weight:700">有餐點今天已賣完，只能選明天以後取餐</p><p class="note" id="offHint" style="display:none;color:#c0392b;font-weight:700">店裡暫停接今日訂單，請選明天以後取餐 🙏</p><p class="note" id="limHint" style="display:none;color:#c0392b;font-weight:700;font-size:16px">🧧 有限定期間的餐點，只能選限定的日子取餐</p><p class="note" id="tmHint">上午 10:30–下午 1:50、下午 4:30–7:50，每 10 分鐘一個時段，下單後最快 10 分鐘可取；週日休息</p>
 <label>備註</label><textarea id="nt" rows="2" placeholder="例如：要收據、少飯"></textarea>
 <p class="note" style="color:#c8702a;font-weight:700">送出訂單後，店家回覆『收到』才算訂餐成功；5 個以上大單店家會電話確認</p>
 <div id="review" style="background:#f6faf3;border:2px solid #cfe5c4;border-radius:12px;padding:12px 14px;margin:14px 0 8px;font-size:16px;line-height:1.7"></div>
@@ -169,6 +197,7 @@ nav a.ymnav{background:#fff3e6;color:#a15c12;font-weight:800}
 <div class="mdl" id="okMdl"><div class="bx" id="okBx"></div></div><div class="mdl" id="cMdl"><div class="bx" id="cBx"></div></div>
 <script src="menu.js"></script>
 <script src="yearmeal.js"></script>
+<script src="ly-delivery.js"></script>
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbydH3BwwshrRx2gKBIai570utuJRZCNYLdm-BNwcu_K44d8_NPxybF7l7yFXt6Ge9vwdw/exec'; // 接單後端網址（Apps Script 部署後貼上）
 // 菜單：[分類, 品名, 價錢, 說明, 照片, {lim,from,to}]；先用 menu.js 的備用菜單，讀到後台「菜單」表就換掉
@@ -224,8 +253,7 @@ function closeSheet(fromPop){const sh=document.getElementById('sheet');sh.style.
  if(!fromPop&&history.state&&history.state.cart)history.back()}
 addEventListener('popstate',()=>{if(sheetOpen())closeSheet(true)});
 function cartRender(){const c=document.getElementById('cart');
- c.innerHTML=M.map((m,i)=>q[i]?`<div class="ci2" id="ci${i}">${imgOf(m)?`<img class="th" src="${esc(imgOf(m))}" alt="" onerror="this.outerHTML='<div class=th>🍱</div>'">`:'<div class="th">🍱</div>'}<div class="n">${esc(m[1])}<small>單價 $${m[2]}</small></div><button class="del" onclick="cartSet(${i},0,true)" aria-label="刪除 ${esc(m[1])}">🗑</button><div class="qty"><button class="m" onclick="cartSet(${i},q[${i}]-1,true)">−</button><input class="qin" id="cq${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="cartSet(${i},this.value,false)" onchange="cartSet(${i},this.value,true)" onblur="cartSet(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="cartSet(${i},q[${i}]+1,true)">＋</button></div><span class="st" id="cs${i}">$${m[2]*q[i]}</span></div>`:'').join('')+`<div class="ctot" id="ctot">合計 $${tot()}（共 ${cnt()} 份）</div>`;
- document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}
+ c.innerHTML=M.map((m,i)=>q[i]?`<div class="ci2" id="ci${i}">${imgOf(m)?`<img class="th" src="${esc(imgOf(m))}" alt="" onerror="this.outerHTML='<div class=th>🍱</div>'">`:'<div class="th">🍱</div>'}<div class="n">${esc(m[1])}<small>單價 $${m[2]}</small></div><button class="del" onclick="cartSet(${i},0,true)" aria-label="刪除 ${esc(m[1])}">🗑</button><div class="qty"><button class="m" onclick="cartSet(${i},q[${i}]-1,true)">−</button><input class="qin" id="cq${i}" value="${q[i]}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" enterkeyhint="done" aria-label="${esc(m[1])} 數量" onfocus="this.select()" oninput="cartSet(${i},this.value,false)" onchange="cartSet(${i},this.value,true)" onblur="cartSet(${i},this.value,true)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"><button onclick="cartSet(${i},q[${i}]+1,true)">＋</button></div><span class="st" id="cs${i}">$${m[2]*q[i]}</span></div>`:'').join('')+`<div class="ctot" id="ctot"></div>`;if(window.lyFillTot)lyFillTot();else document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}
 // 結帳裡改數量：和菜單一樣的清理規則（0–999 整數），同步菜單卡片；打字中不重畫，離開才整理
 function cartSet(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=Math.min(999,Math.max(0,parseInt(d||'0',10)));
  if(q[i]!==n){window.OID=null;window.SID=null}q[i]=n;const e=document.getElementById('q'+i);if(e)e.value=n;upd();
@@ -235,16 +263,17 @@ function cartSet(i,v,fin){const d=String(v).replace(/[^0-9]/g,'').slice(0,3),n=M
  if([...document.getElementById('tm').options].some(o=>o.value==tm))document.getElementById('tm').value=tm;
  if(fin&&!n){cartRender();return}
  if(fin)cartRender();else{const ci=document.getElementById('cq'+i);if(ci&&ci.value!==d)ci.value=d;const cs=document.getElementById('cs'+i);if(cs)cs.textContent='$'+M[i][2]*n;
-  document.getElementById('ctot').textContent=`合計 $${tot()}（共 ${cnt()} 份）`;document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}}
+  if(window.lyFillTot)lyFillTot();else{document.getElementById('ctot').textContent=`合計 $${tot()}（共 ${cnt()} 份）`;document.getElementById('items').textContent=lines().join('\n')+`\n合計：$${tot()}`}}}
 // 往下滑標題列關閉
 (function(){let y0=null,dy=0;const hd=()=>document.getElementById('sheetHd'),inn=()=>document.querySelector('#sheet .in');
  document.addEventListener('touchstart',e=>{if(hd()&&hd().contains(e.target)&&!e.target.closest('button')){y0=e.touches[0].clientY;dy=0}},{passive:true});
  document.addEventListener('touchmove',e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);inn().style.transform=`translateY(${dy}px)`},{passive:true});
  document.addEventListener('touchend',()=>{if(y0===null)return;y0=null;if(dy>80)closeSheet();else inn().style.transform=''})})();
-function txt(){const w='現場取餐',v=id=>document.getElementById(id).value.trim();
+function txt(){const v=id=>document.getElementById(id).value.trim();
 if(!window.OID)window.OID=String(Date.now()).slice(-6)+Math.floor(Math.random()*10); // 客人端 token
 const n=cnt(),pre=isPre();
-return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n姓名：${v('nm')}\n電話：${v('ph')}\n方式：${w}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ '+(window.DEP===true?'第一次訂大單：需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家確認後才成立':window.DEP===false?'老客人免訂金 🙏':'第一次訂大單需付 30% 訂金，訂過的老客人免訂金（店家會確認）')+'；有付訂金的，取餐前兩天以前取消才退':''}${window.SID&&window.CT?'\n要取消請點👉 '+cancelUrl(window.SID,window.CT):''}`}
+const money=window.lyQuoteValid&&lyQuoteValid()?`便當小計：$${tot()}（共 ${n} 個）\n${lyTxtExtra()}`:`${lines().join('\n')}\n合計：$${tot()}（共 ${n} 個）\n${window.lyTxtExtra?lyTxtExtra():'方式：現場自取'}`;
+return `【蓮緣素食 ${pre?'預訂單':'訂單'}】編號 ${window.SID||OID}\n${window.lyQuoteValid&&lyQuoteValid()?lines().join('\n')+'\n':''}${money}\n姓名：${v('nm')}\n電話：${v('ph')}\n時間：${v('tm')}${v('nt')?'\n備註：'+v('nt'):''}${pre&&n>=30?'\n※ '+(window.DEP===true?'第一次訂大單：需付 30% 訂金（約 $'+Math.round(tot()*0.3)+'），店家確認後才成立':window.DEP===false?'老客人免訂金 🙏':'第一次訂大單需付 30% 訂金，訂過的老客人免訂金（店家會確認）')+'；有付訂金的，取餐前兩天以前取消才退':''}${window.SID&&window.CT?'\n要取消請點👉 '+cancelUrl(window.SID,window.CT):''}`}
 function fmt(d){const h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');return (h<12?'上午 ':'下午 ')+(h>12?h-12:h)+':'+m}
 // 取餐時段：上午 10:30–13:50、下午 16:30–19:50，每 10 分鐘；至少提前 LEAD 分鐘
 var LEAD=10;
@@ -280,17 +309,18 @@ function setMode(){const n=cnt(),pre=isPre(),box=document.getElementById('preBox
  preTimes()}
 function preTimes(){const sel=document.getElementById('tm'),k=document.getElementById('pd').value;sel.innerHTML='';if(!k)return;const [y,m,dd]=k.split('-').map(Number),day=new Date(y,m-1,dd);
  addDay(sel,day,`${m}/${dd}（${WK[day.getDay()]}）`,null)}
-['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});
+['nm','ph'].forEach(k=>{const e=document.getElementById(k);e.value=localStorage.getItem('ly_'+k)||'';e.addEventListener('input',()=>localStorage.setItem('ly_'+k,e.value))});if(window.lyInitDeliveryFields)lyInitDeliveryFields();
 function tmOk(){if(!document.getElementById('tm').value){lyHaptic('error');alert(isPre()?'這個數量目前沒有可預訂的日子，請打電話 02-2703-8823':'請選取餐時間');return false}return true}
-function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){lyHaptic('error');alert('請填姓名和電話');return false}return true}
+function ok(){if(!tmOk())return false;if(!document.getElementById('nm').value.trim()||!document.getElementById('ph').value.trim()){lyHaptic('error');alert('請填姓名和電話');return false}if(window.lyOkDelivery&&!lyOkDelivery())return false;return true}
 function review(){const r=document.getElementById('review');if(!r)return;const v=id=>(document.getElementById(id)||{}).value||'',tm=document.getElementById('tm'),pd=document.getElementById('pd'),pre=isPre();
  const tl=tm&&tm.selectedIndex>=0&&tm.options[tm.selectedIndex]?tm.options[tm.selectedIndex].text:'（請選時間）',dl=pre&&pd&&pd.selectedIndex>=0&&pd.options[pd.selectedIndex]?pd.options[pd.selectedIndex].text+' ':'';
- r.innerHTML='<b style="font-size:17px">🧾 請確認你的訂單</b><br>'+M.map((m,i)=>q[i]?esc(m[1])+' × '+q[i]+'　$'+(m[2]*q[i]):null).filter(Boolean).join('<br>')+'<div style="border-top:1px dashed #9c9;margin:6px 0;font-weight:700;font-size:18px">合計 $'+tot()+'（共 '+cnt()+' 份）</div>🕒 取餐：'+esc(dl+tl)+'<br>👤 '+(esc(v('nm').trim())||'<span style="color:#c0392b">（請填姓名）</span>')+'　📱 '+(esc(v('ph').trim())||'<span style="color:#c0392b">（請填電話）</span>')+(v('nt').trim()?'<br>📝 '+esc(v('nt').trim()):'')}
+ r.innerHTML='<b style="font-size:17px">🧾 請確認你的訂單</b><br>'+M.map((m,i)=>q[i]?esc(m[1])+' × '+q[i]+'　$'+(m[2]*q[i]):null).filter(Boolean).join('<br>')+(window.lyReviewTotHtml?lyReviewTotHtml():'<div style="border-top:1px dashed #9c9;margin:6px 0;font-weight:700;font-size:18px">合計 $'+tot()+'（共 '+cnt()+' 份）</div>')+'🕒 '+(window.isDelivery&&isDelivery()?'希望送達：':'取餐：')+esc(dl+tl)+'<br>'+(window.lyReviewExtra?lyReviewExtra()+'<br>':'')+'👤 '+(esc(v('nm').trim())||'<span style="color:#c0392b">（請填姓名）</span>')+'　📱 '+(esc(v('ph').trim())||'<span style="color:#c0392b">（請填電話）</span>')+(v('nt').trim()?'<br>📝 '+esc(v('nt').trim()):'')}
 document.addEventListener('input',review);document.addEventListener('change',review);document.addEventListener('click',()=>setTimeout(review,0));
 function lineUrl(t){return 'https://line.me/R/oaMessage/@522ociyo/?'+encodeURIComponent(t)}
 // 送單給後端，取回店家編號（MMDD-NNN）；失敗或逾時就用 token 當編號，點餐不中斷
 async function sendGas(){if(!GAS_URL)return;txt();const v=id=>document.getElementById(id).value.trim();
  const o={token:OID,name:v('nm'),phone:v('ph'),pickup:v('tm'),note:v('nt'),pre:isPre()?1:0,date:isPre()?v('pd'):'',total:tot(),items:M.map((m,i)=>q[i]?{n:m[1],q:q[i]}:null).filter(Boolean)};
+ if(window.lyDeliveryPayload)Object.assign(o,lyDeliveryPayload());if(window.lyNoteForGas)o.note=lyNoteForGas(o.note);
  const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>ac&&ac.abort(),6000);
  try{const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),signal:ac&&ac.signal});
   const d=await r.json();if(d&&d.ok&&/^[0-9A-Za-z-]{4,20}$/.test(d.id)){window.SID=d.id;window.CT=d.ct||'';if(d.ct)try{localStorage.ly_last=JSON.stringify({id:d.id,t:d.ct})}catch(e){}saveMine(d.id,d.ct||'',isPre()?v('pd'):'');if(d.pre)window.DEP=!!d.deposit}else if(d&&/^pre:/.test(d.error))window.PREERR=d.error.slice(4)}catch(e){}finally{clearTimeout(tm)}}
@@ -315,7 +345,7 @@ function cancelUrl(id,t){return location.origin+location.pathname+'?cancel='+enc
 async function gpost(o){const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json()}
 function mdl(id,html){const m=document.getElementById(id);document.getElementById(id=='okMdl'?'okBx':'cBx').innerHTML=html;m.style.display=html?'flex':'none'}
 function showOk(){mdl('okMdl',`<div style="font-size:48px">✅</div><h3 style="color:#2e7d32">訂單已送出！<br>編號 ${esc(window.SID)}</h3>
- <div style="text-align:left;background:#f6faf3;border:1.5px solid #cfe5c4;border-radius:10px;padding:8px 12px;margin:8px 0;max-height:34vh;overflow:auto;font-size:15px;line-height:1.6"><b>🧾 購物明細</b><br>${M.map((m,i)=>q[i]?esc(m[1])+' × '+q[i]+' = $'+(m[2]*q[i]):null).filter(Boolean).join('<br>')}<div style="border-top:1px dashed #9c9;margin-top:4px;font-weight:700">共 ${cnt()} 份｜合計 $${tot()}</div>🕒 取餐：${esc((isPre()&&document.getElementById('pd').selectedOptions[0]?document.getElementById('pd').selectedOptions[0].text+' ':'')+(document.getElementById('tm').selectedOptions[0]?document.getElementById('tm').selectedOptions[0].text:''))}</div>
+ <div style="text-align:left;background:#f6faf3;border:1.5px solid #cfe5c4;border-radius:10px;padding:8px 12px;margin:8px 0;max-height:48vh;overflow:auto;font-size:15px;line-height:1.6"><b>🧾 購物明細</b><br>${M.map((m,i)=>q[i]?esc(m[1])+' × '+q[i]+' = $'+(m[2]*q[i]):null).filter(Boolean).join('<br>')}${window.lyReviewTotHtml?lyReviewTotHtml():'<div style="border-top:1px dashed #9c9;margin-top:4px;font-weight:700">共 '+cnt()+' 份｜合計 $'+tot()+'</div>'}🕒 ${window.isDelivery&&isDelivery()?'希望送達：':'取餐：'}${esc((isPre()&&document.getElementById('pd').selectedOptions[0]?document.getElementById('pd').selectedOptions[0].text+' ':'')+(document.getElementById('tm').selectedOptions[0]?document.getElementById('tm').selectedOptions[0].text:''))}<br>${window.lyReviewExtra?lyReviewExtra():''}</div>
  <p>最後一步：按下面綠色按鈕，在 LINE 按「傳送」，店家回覆『收到』才算成功。</p>
  <a class="bb ln" id="goLine" href="${esc(lineUrl(txt()))}">💬 開啟 LINE 傳送訂單</a>
  <button onclick="mdl('okMdl','')" style="background:none;border:0;color:#888;font-size:14px;margin-top:8px;text-decoration:underline">關閉</button><p class="sm">要看店裡進度或取消，到「我的便當」頁面就有。</p>`)}
@@ -336,7 +366,7 @@ function cRes(st,id,t){clearTimeout(cPoll);const C={cancelled:['✅','已取消'
 </script>
 <script src="yearmeal-customer.js"></script>
 <script>// 20261110 手感：確定送出加 iPhone 觸覺；加到主畫面提示（客人頁）
-lyScan('#lineBtn');
+lyScan('#lineBtn');if(document.getElementById('dlQuoteBtn'))lyScan('#dlQuoteBtn');
 lyA2hs('ly-a2hs-dismissed-customer','📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：Safari 點分享 → 加入主畫面','📲 把蓮緣點餐加到主畫面，用起來會全螢幕像 App：瀏覽器右上角 ⋮ → 加到主畫面');
 </script>
 </body></html>

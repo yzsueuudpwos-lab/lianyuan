@@ -157,3 +157,20 @@ html[data-theme="dark"] input[type=date]::-webkit-calendar-picker-indicator{filt
   :root:not([data-theme="light"]) #printSt.ok{background:var(--ok-bg);color:var(--ok-fg)}
   :root:not([data-theme="light"]) #printSt.bad{background:var(--err-bg);color:var(--err-fg)}
 }
+
+/* 20261114 外送費預估（深色） */
+html[data-theme="dark"] #dlBox{background:var(--g2);border-color:var(--g)}
+html[data-theme="dark"] #dlBox .note{color:var(--fg)}
+html[data-theme="dark"] #dlFee.ok{background:var(--ok-bg);color:var(--ok-fg);border-color:#2f6b22}
+html[data-theme="dark"] #dlFee.load{background:var(--warn-bg);color:var(--warn-fg);border-color:#a07a20}
+html[data-theme="dark"] #dlFee.bad{background:var(--err-bg);color:var(--err-fg);border-color:#8a2b20}
+html[data-theme="dark"] .fee-amt{color:var(--o)}
+html[data-theme="dark"] .tot-break{border-top-color:var(--g)}
+html[data-theme="dark"] .tot-break .r.grand{color:var(--g);border-top-color:var(--g)}
+html[data-theme="dark"] .card .dl{background:var(--g2);color:var(--fg)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) #dlBox{background:var(--g2);border-color:var(--g)}
+  :root:not([data-theme="light"]) #dlFee.ok{background:var(--ok-bg);color:var(--ok-fg)}
+  :root:not([data-theme="light"]) #dlFee.bad{background:var(--err-bg);color:var(--err-fg)}
+  :root:not([data-theme="light"]) .card .dl{background:var(--g2);color:var(--fg)}
+}
